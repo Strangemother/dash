@@ -11,7 +11,7 @@
 	height: 600px;
 }
 
-.icon .svg.closed {
+.icon .svg.closed, .icon .svg {
 width: 75%;
 margin: 12.5%;
 text-align: center;

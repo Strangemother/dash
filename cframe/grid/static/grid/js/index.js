@@ -202,20 +202,23 @@ Widget = function () {
 	self.showOpenState = function(){
 		self.height(self.options.openHeight);
 		self.width(self.options.openWidth);
-		self.icon()[0].src = self.openIconUrl();
 		self.text().css('font-size', '24px');
 		self.closed = false;
 		self.open = true;
+		self.icon(self.options.openIcon)
+		self.options.openHandler()
 		return self;
 	}
 
 	self.showClosedState = function(){
 		self.width(self.options.closedWidth);
 		self.height(self.options.closedHeight);
-		self.icon()[0].src = self.closedIconUrl();
+		//self.icon()[0].src = self.closedIconUrl();
 		self.text().css('font-size', '12px');
 		self.closed = true;
+		self.icon(self.options.closedIcon)
 		self.open = false;
+		self.options.closedHandler()
 		return self;
 	}
 
@@ -242,12 +245,12 @@ Widget = function () {
 
 	self.closedIcon = function(){
 		self.options.closedIcon = arg(arguments, 0, self.options.closedIcon);
-		return sprintf('<img src="/static/img/icons/%(icon)s" class="svg closed"/>', {icon: self.options.closedIcon});
+		return sprintf('<img src="%(url)s" class="svg closed"/>', {url: self.closedIconUrl()});
 	}
 
 	self.openIcon = function(){
-		self.options.openIcon = arg(arguments, 0, aelf.options.openIcon);
-		return sprintf('<img src="%(url)s" class="svg open"/>', {icon: self.openIconUrl()});
+		self.options.openIcon = arg(arguments, 0, self.options.openIcon);
+		return sprintf('<img src="%(url)s" class="svg open"/>', {url: self.openIconUrl()});
 	}
 
 	self.openIconUrl = function(){
@@ -264,9 +267,10 @@ Widget = function () {
 		var _iconName = arg(arguments, 0, null);
 
 		if(_iconName != null) {
+		
 			self.element.find('.icon').empty();
-			self.options[(self.closed)? 'closedIcon': 'openIcon'](_iconName)
-			self.element.find('.icon').append('<img class="new"></img>')
+			var img =self[(self.closed)? 'closedIcon': 'openIcon'](_iconName)
+			self.element.find('.icon').append(img)
 		}
 
 		return el
