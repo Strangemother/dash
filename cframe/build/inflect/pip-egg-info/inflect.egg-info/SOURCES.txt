@@ -1,0 +1,6 @@
+README.txt
+inflect.py
+pip-egg-info/inflect.egg-info/PKG-INFO
+pip-egg-info/inflect.egg-info/SOURCES.txt
+pip-egg-info/inflect.egg-info/dependency_links.txt
+pip-egg-info/inflect.egg-info/top_level.txt

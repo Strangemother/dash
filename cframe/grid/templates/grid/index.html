@@ -1,0 +1,53 @@
+{% extends 'grid/base.html' %}
+{% load static from staticfiles %}
+{% block header %}
+	{{ block.super }}
+	<link rel="stylesheet" type="text/css" href="{% static 'grid/css/index.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'grid/css/gridster/jquery.gridster.min.css' %}">
+{% endblock header %}
+{% block js %}
+	<script type="text/javascript" src='{% static 'grid/js/index.js' %}'></script>
+	<script type="text/javascript" src="{% static 'grid/js/jquery.gridster.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'grid/js/jquery.isotope.min.js' %}"></script>
+{% endblock js %}
+{% block gravel-templates %}
+	<div class="add-widget">
+		<h2 class="title">Add a Widget</h2>
+		<p>A widget is a single component on your dashboard. it's easy!
+			<ul>
+				<li><a href="javascript:;">Title</a></li>
+				<li><a href="javascript:;">Icon</a></li>
+				<li><a href="javascript:;">Size</a></li>
+				<li><a href="javascript:;">Content</a></li>
+			</ul>
+		</p>
+	</div>
+{% endblock gravel-templates %}
+{% block main %}
+	<div class="gridster">
+    <ul>
+        <li data-row="1" data-col="1" data-sizex="1" data-sizey="1"></li>
+        <li data-row="2" data-col="1" data-sizex="1" data-sizey="1"></li>
+        <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
+
+        <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"></li>
+        <li data-row="2" data-col="2" data-sizex="2" data-sizey="2"></li>
+
+        <li data-row="1" data-col="4" data-sizex="1" data-sizey="1"></li>
+        <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"></li>
+        <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"></li>
+
+        <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
+        <li data-row="3" data-col="5" data-sizex="1" data-sizey="1"></li>
+
+        <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"></li>
+        <li data-row="2" data-col="6" data-sizex="1" data-sizey="2"></li>
+    </ul>
+</div>
+<div class="tools">
+	<ul>
+		<li><a href='javascript:;' id='createWeatherWidget'>Weather</a></li>
+		<li>Color <input type="text" id='color' /></li>
+	</ul>
+</div>
+{% endblock main %}
