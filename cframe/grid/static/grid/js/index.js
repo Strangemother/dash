@@ -1,17 +1,23 @@
 $(document).ready(function(){
-	 $(".gridster ul").gridster({
-        widget_margins: [10, 10],
-        widget_base_dimensions: [140, 140]
-    });
+	 
 
 	 $('#createWeatherWidget').click(function(){
 		gridding.addWidget(WeatherWidget)
 	 })
 
+	 //gridding.createGrid(gridding.layout())
 })
 
 gridding = {};
 
+gridding.createGrid = function(serializeParams){
+	$(".gridster ul").gridster({
+        widget_margins: [10, 10],
+        widget_base_dimensions: [140, 140],
+        serialize_params: serializeParams
+    });
+    gridding.grid = $(".gridster ul").gridster().data('gridster');
+}
 gridding.addWidget = function(){
 	var widget = arg(arguments, 0, null);
 	var gridster = $(".gridster ul").gridster().data('gridster');	
@@ -26,6 +32,16 @@ gridding.addWidget = function(){
  
 }
 
+gridding.saveLayout = function(){
+	var name = arg(arguments, 0, 'default');
+	localStorage.setItem('layout-' + name,JSON.stringify(gridding.grid.serialize()))
+}
+
+gridding.layout = function(){
+	var name = arg(arguments, 0, 'default');
+	return l = JSON.parse(localStorage.getItem('layout-' + name))
+	
+}
 
 WeatherWidget = {
 	closedIcon: 'weather.svg',
