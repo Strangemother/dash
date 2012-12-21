@@ -1,23 +1,134 @@
 $(document).ready(function(){
+	 gridding.createGrid(gridding.layout());
+	 page.appendWidgets([HelloWorldWidget, WeatherWidget]);
+	 $('.add-button').click(function(){
+	 	$('.tools').show();
+
+	 });
 	 
-
-	 $('#createWeatherWidget').click(function(){
-		gridding.addWidget(WeatherWidget)
-	 })
-
-	 //gridding.createGrid(gridding.layout())
 })
+Sadie = {};
+Sadie.model = {
+	defaultBackgroundColor: '#fff'
+}
 
+page = {};
 gridding = {};
+utils = {}
+Sadie.page=page;
+Sadie.gridding=gridding;
+
+page.backgroundColor = function(){
+	var col = arg(arguments, 0, Sadie.model.defaultBackgroundColor);
+	$('body').css('background-color', col);
+}
+
+page.appendWidgets = function() {
+	var widgets = arg(arguments, 0, []);
+	for(var i=0; i < widgets.length; i++) {
+		page.appendWidget(widgets[i])
+	}
+}
+
+page.appendWidget = function() {
+	var widgetData = arg(arguments, 0, null);
+
+	if(widgetData == null) {
+		return false;
+	}
+
+	page.createInterfaceButton(widgetData)
+	return true;
+}
+
+page.fullalert = function(){
+	var largeText = arg(arguments, 0, 'Important');
+	var smallText = arg(arguments, 1, 'An important notice has taken place.');
+	var icon = arg(arguments, 2, 'caution.svg');;
+	var highlightColor = arg(arguments, 3, '#800000');
+	var lowlightColor = arg(arguments, 4, '#333333');
+
+	var colors=Color.convertColor(lowlightColor)
+	
+	var pc = sprintf('rgba(%s,%s,%s, %s)', colors[0], colors[1], colors[2], .2 )
+
+	page.backgroundColor(pc)
+	/*
+	Method called when the alert opens
+	 */
+	var openHandler = arg(arguments, 5, function(){});
+
+	/*
+	Activates when the user closes the message.
+	Return false to stop the message from closing, else true will
+	allow the popup api to continue
+	 */
+	var closeHandler = arg(arguments, 6, function(){ return true; });
+	var id = arg(arguments, 7, utils.randomId());
+	$('body').uiji('div.fullalert{id=' + id + '}', function(){
+		
+		$(this).uiji('img{src=/static/img/icons/' + icon + '}', function(){
+			$(this).fadeIn()
+		});
+
+		$(this).uiji('h1.large"' + largeText + '"');
+		$(this).uiji('p.large"' + smallText + '"', function(){
+			$(this).fadeIn('slow')
+		});
+
+		openHandler(this)
+
+		$(this).click(function(e){
+			
+			var closeVal = closeHandler(e);
+			if(closeVal === true) {
+				page.backgroundColor()
+				$('.fullalert#' + id).fadeOut('fast', function(){
+					$(this).remove()
+				});
+			} else {
+				console.log('User cannot close this popup as closeHandler for ' + id +' returned', closeVal)
+			}
+		})
+
+	})
+	/*
+	Show a large page alert
+	 */
+}
+
+page.createInterfaceButton = function(){
+	var widgetData = arg(arguments, 0, null);
+
+	// <li><a href='javascript:;' id='createWeatherWidget'>Weather</a></li>
+	$('div.tools ul').uiji('li', function(){
+		$(this).uiji('a{href=javascript:;}.interface-button"' + widgetData.name  + '"', function(){
+			$(this).click(function(){
+				gridding.addWidget(widgetData);
+			})
+		})
+	})
+}
+
+utils.randomId = function()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length)); 
+    return text;
+}
 
 gridding.createGrid = function(serializeParams){
 	$(".gridster ul").gridster({
         widget_margins: [10, 10],
-        widget_base_dimensions: [140, 140],
+        widget_base_dimensions: [200, 200],
         serialize_params: serializeParams
     });
     gridding.grid = $(".gridster ul").gridster().data('gridster');
 }
+
 gridding.addWidget = function(){
 	var widget = arg(arguments, 0, null);
 	var gridster = $(".gridster ul").gridster().data('gridster');	
@@ -43,10 +154,54 @@ gridding.layout = function(){
 	
 }
 
+/// =============================================================================================
+
+HelloWorldWidget = {
+	name: 'Hello World',
+	closedIcon: 'hello.svg',
+	closedText: 'Hello',
+	openIcon: 'world.svg',
+	openText: 'World.',
+	visibleHandler: function(){
+		page.fullalert('Hello World Widget Created',
+			'Some widgets can show a popup when they are first created.' , 'creation.svg')
+	}
+}
+
 WeatherWidget = {
+	name: 'Weather',
 	closedIcon: 'weather.svg',
 	closedText: 'Weather Widget',
-	closedIconColor: '#CCCCCC'
+	closedIconColor: '#CCCCCC',
+	config: {
+		// list of woeid for yahoo api
+		locations: []
+	}
+}
+
+AddWidgetWidget = {
+	name: 'Add'
+}
+
+ExampleWidget = {
+	/* annotated */
+
+	/* the name of your widget for use with the add button
+	and interface alerts */
+	name: 'Example',
+
+	/*
+	Icon displayed when closed 
+	<img>
+	*/
+	closedIcon: 'image.ext',
+
+	/*
+	closed text
+	*/
+	closedText: 'closed example widget',
+
+
 }
 
 Widget = function () {
@@ -112,7 +267,7 @@ Widget = function () {
 			format: '<li class="new"><div class="spinner"></div><div class="icon">%(icon)s</div><div class="text">%(text)s</div></li>',
 			// When this widget is open
 			onLoad: function(){
-
+				console.log('on load')
 			},
 			visible: true
 
@@ -154,7 +309,13 @@ Widget = function () {
 		return self;
 	}
 
-
+	self.toggleState = function() {
+		if(self.closed) {
+			self.showOpenState()	
+		} else {
+			self.showClosedState()
+		}
+	}
 
 	// Add this to the grid that is passed 
 	// or was passed in instantiation.
@@ -167,13 +328,6 @@ Widget = function () {
 			
 			// Click Handler
 			self.element.click(function(e){
-
-				if(self.closed) {
-					self.showOpenState()	
-				} else {
-					self.showClosedState()
-				}
-				
 				self.options.onClick(e)
 			});
 		}
