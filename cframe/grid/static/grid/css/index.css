@@ -12,6 +12,16 @@
 	height: 600px;
 }
 
+.gridster ul li {
+	border: solid 1px;
+	list-style: none;
+	min-height: 10px;
+	min-width: 10px;
+	padding: 5px;
+	float: left;
+	margin: 5px;
+}
+
 .icon .svg.closed, .icon .svg {
 width: 75%;
 margin: 12.5%;
