@@ -3,12 +3,23 @@
 	list-style: none;
 	border-color: #666;
 	border-radius: 2px;
+	background-color: #FFF;
 	box-shadow: 0px 2px 2px rgba(100, 100, 100, .2);
 }
 
 .gridster.ready ul{
 	width: 1024px;
 	height: 600px;
+}
+
+.gridster ul li {
+	border: solid 1px;
+	list-style: none;
+	min-height: 10px;
+	min-width: 10px;
+	padding: 5px;
+	float: left;
+	margin: 5px;
 }
 
 .icon .svg.closed, .icon .svg {
@@ -35,6 +46,7 @@ margin-bottom: 10px;
 	width: 100%;
 	z-index: 10;
 	bottom: 0;
+	display: none;
 }
 
 .spinner {
@@ -88,8 +100,26 @@ margin-bottom: 10px;
 	line-height: 2.5em;
 	text-align: center;
 	padding: 30px 0;
+	cursor: pointer;
 }
 
 .fullalert img {
 	height: 200px;
+}
+
+.add-button {
+	display: block;
+	position: absolute;
+	bottom: 5px;
+	left: 5px;
+	z-index: 9;
+	background-color: #EEE;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	color: #333;
+	text-decoration: none;
+	border: solid 1px #999;
+	box-shadow: 0 1px 1px #999;
 }

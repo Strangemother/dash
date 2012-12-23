@@ -76,7 +76,6 @@ var sprintf = (function() {
 
 	str_format.format = function(parse_tree, argv) {
 		var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
-		console.log(tree_length)
 		for (i = 0; i < tree_length; i++) {
 			node_type = get_type(parse_tree[i]);
 			if (node_type === 'string') {
