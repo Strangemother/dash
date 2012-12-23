@@ -828,3 +828,4 @@ function Hammer(element, options, undefined)
         }
     }
 }
+>>>>>>> 4a7a890f22f4c049837b2a2aa66bd2a7e7d82e7f
