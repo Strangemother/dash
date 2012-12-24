@@ -21,8 +21,10 @@ gridding.addWidget = function(){
             function (widget) {
                 //jQuery, canvas and the app/sub module are all
                 //loaded and can be used here now.
-                console.log("Add after requiest")
-                debugger;
+                console.log("Add after requiest");
+                debugger
+                // what is scope here.
+                // make cstome scope.
                 wid = Widget(gridster, widget);
                 wid.addToGrid();
          });

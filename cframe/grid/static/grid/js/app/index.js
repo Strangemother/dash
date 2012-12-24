@@ -1,6 +1,5 @@
 $(document).ready(function(){
     require(['gridding'], function(){
-        console.log("Gridding loaded");
         gridding.createGrid(gridding.layout());
     })
 

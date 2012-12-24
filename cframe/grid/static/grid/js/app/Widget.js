@@ -10,7 +10,6 @@ Widget = function () {
         self._closedIcons = [];
         self._color = null;
         self.element = null;
-        self.dependencies = ['gridding'];
         self.options = {
 
             // Color of the background.
