@@ -7,6 +7,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth import logout
+from widget.models import Widget
+
 
 def context(request):
 	c = {}
@@ -15,6 +17,9 @@ def context(request):
 # 
 def home(request):
     c = {}
+
+    c['widgets'] = Widget.objects.filter(active=True)
+
     return render_to_response('grid/index.html', c, 
                               context_instance=RequestContext(request, 
                                                         processors=[context]))

@@ -24,7 +24,7 @@ HelloWorldWidget = {
             if(ev.type == 'doubletap') this.toggleState();
         }
     },
-}
+} 
 
 WeatherWidget = {
     name: 'Weather',

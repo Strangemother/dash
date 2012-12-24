@@ -23,3 +23,16 @@ def list(request):
         {'form': form, 'widgets': widgets},
         context_instance=RequestContext(request)
     )
+
+def install_widget(widget):
+    pass
+    # perform installation, 
+    # get JS,
+    # get py requirements
+    # IMG LOC
+    # perm data endpoint for saving information
+    # get css
+    # add static points
+    # provide HTML pages for templated endpoint with forced widget base.
+    # link icons
+    # get html endpoints

@@ -8,19 +8,25 @@
 {% endblock header %}
 
 {% block js %}
-	<script type="text/javascript" src='{% static 'grid/js/index.js' %}'></script>
+	<script type="text/javascript" data-main="{% static 'grid/js/index_app.js' %}" src='{% static 'grid/js/require.js' %}'></script>
+
+	<script type="text/javascript" src="{% static 'grid/js/index.js' %}"></script>
+	<script type="text/javascript" src='{% static 'grid/js/gridding.js' %}'></script>
+	<script type="text/javascript" src='{% static 'grid/js/model.js' %}'></script>
+	<script type="text/javascript" src='{% static 'grid/js/page.js' %}'></script>
 	<script type="text/javascript" src='{% static 'grid/js/Widget.js' %}'></script>
-	<script type="text/javascript" src='{% static 'grid/js/Weather-widget.js' %}'></script>
-	<script type="text/javascript" src='{% static 'grid/js/hammer.js' %}'></script>
+
 	<script type="text/javascript" src="{% static 'grid/js/jquery.gridster.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'grid/js/jquery.isotope.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'grid/js/jquery.imagesloaded.min.js' %}"></script>
+	<script type="text/javascript" src='{% static 'grid/js/hammer.js' %}'></script>
+	<!-- <script type="text/javascript" src='{% static 'grid/js/index.js' %}'></script>
+	<script type="text/javascript" src='{% static 'grid/js/Widget.js' %}'></script>
+	<script type="text/javascript" src='{% static 'grid/js/Weather-widget.js' %}'></script> -->
 {% endblock js %}
 
 {% block gravel-templates %}
-	<div class="cacheImageContainer">
-		
-	</div>
+	<div class="cacheImageContainer"></div>
 	<div class="add-widget">
 		<h2 class="title">Add a Widget</h2>
 		<p>A widget is a single component on your dashboard. it's easy!
@@ -50,4 +56,4 @@
 		<!-- <li>Color <input type="text" id='color' /></li> -->
 	</ul>
 </div>
-{% endblock main %} 
+{% endblock %}

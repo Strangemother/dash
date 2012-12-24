@@ -173,7 +173,7 @@ Widget = function () {
         if (grid) {
             var html = self.html();
             self.element = grid.add_widget(html)
-            self.element.hide()
+            // self.element.opacity(.5)
             
             // Click Handler
             self.element.click(function(e){
@@ -614,4 +614,3 @@ Widget = function () {
 
     return self.init.apply(self, arguments)
 }
-
