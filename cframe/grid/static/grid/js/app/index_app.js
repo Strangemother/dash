@@ -16,10 +16,17 @@ registerWidget = function (widgetData){
     /*method used to import a Custom widget through require.js*/
     //also scoped
     // console.log("registerWidget");
+    /*
+    Provide a scope to the widget.
+    */
+    var f = function(widgetData){
 
-    (function(){
-        define(widgetData)
-    } ())
+        define(['app/Widget'], function(){ 
+            return widgetData;
+        })
+    }
+
+    f(widgetData)
 }
 
 ASSET_IMG_URL = '/static/grid/img/';

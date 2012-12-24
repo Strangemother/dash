@@ -71,6 +71,7 @@ WIDGET = {
     },
     visibleHandler: function(){
         console.log("visible");
+        debugger;
         if(!this.store.has('weather')) {
             this.options.getWeather.apply(this)
         }

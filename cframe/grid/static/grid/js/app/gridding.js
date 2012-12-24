@@ -13,7 +13,7 @@ gridding.createGrid = function(serializeParams){
 
 gridding.addWidget = function(){
     var widget = arg(arguments, 0, null);
-    console.log("addWidget")
+   
     var gridster = $(".gridster ul").gridster().data('gridster');  
     if(typeof(widget) == 'string') {
         // Start the main app logic.
@@ -21,7 +21,8 @@ gridding.addWidget = function(){
             function (widget) {
                 //jQuery, canvas and the app/sub module are all
                 //loaded and can be used here now.
-                console.log("Loaded widget", widget)
+                console.log("Add after requiest")
+                debugger;
                 wid = Widget(gridster, widget);
                 wid.addToGrid();
          });

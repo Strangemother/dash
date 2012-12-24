@@ -2,6 +2,7 @@
 Widget = function () {
     var self = {};
 
+
     self.init = function(){
         self._grid = arg(arguments, 0, null);
         self._options = arg(arguments, 1, {});
@@ -9,7 +10,7 @@ Widget = function () {
         self._closedIcons = [];
         self._color = null;
         self.element = null;
-
+        self.dependencies = ['gridding'];
         self.options = {
 
             // Color of the background.
@@ -94,9 +95,17 @@ Widget = function () {
         }
 
         //debugger;
-        self.options = $.extend( self.options, self._options);
+        self.renderoptions()
 
         return self;
+    }
+
+    self.renderoptions = function(){
+        if(!self._renderedOptions) {
+            self._renderedOptions = true;
+            self.options = $.extend( self.options, self._options);
+        }
+        return self.options
     }
 
     /*
@@ -377,7 +386,7 @@ Widget = function () {
         self.stopIconTimer(ref);
         self[ref + '_timer'] = window.setInterval(function(ref, icons){
             ticker++;
-            console.log("images tick")
+        
             if(delay >= (1000 / 25) && icons.hasOwnProperty('length')) {
                 //debugger;
                 if(icons.length == 1) {

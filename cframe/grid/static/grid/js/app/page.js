@@ -157,8 +157,10 @@ page.createInterfaceButton = function(){
 
     // <li><a href='javascript:;' id='createWeatherWidget'>Weather</a></li>
     $('div.tools ul').uiji('li', function(){
-        $(this).uiji('a{href=javascript:;}.interface-button"' + (widgetData.name || widgetData)  + '"', function(){
+        var name =  (widgetData.name || widgetData).replace('_', ' ');
+        $(this).uiji('a{href=javascript:;}.interface-button"' + name + '"', function(){
             $(this).click(function(){
+                console.log("createInterfaceButton");
                 gridding.addWidget(widgetData);
             })
         })

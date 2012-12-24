@@ -8,18 +8,19 @@
 {% endblock header %}
 
 {% block js %}
-	<script type="text/javascript" data-main="{% static 'grid/js/index_app.js' %}" src='{% static 'grid/js/require.js' %}'></script>
+	<script type="text/javascript" src="{% static 'grid/js/vendor/jquery.gridster.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'grid/js/vendor/jquery.isotope.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'grid/js/vendor/jquery.imagesloaded.min.js' %}"></script>
+	<script type="text/javascript" src='{% static 'grid/js/vendor/hammer.js' %}'></script>
+	
+	<script type="text/javascript" data-main="{% static 'grid/js/app/index_app.js' %}" src='{% static 'grid/js/vendor/require.js' %}'></script>
 
-	<script type="text/javascript" src="{% static 'grid/js/index.js' %}"></script>
-	<script type="text/javascript" src='{% static 'grid/js/gridding.js' %}'></script>
-	<script type="text/javascript" src='{% static 'grid/js/model.js' %}'></script>
-	<script type="text/javascript" src='{% static 'grid/js/page.js' %}'></script>
-	<script type="text/javascript" src='{% static 'grid/js/Widget.js' %}'></script>
+	<script type="text/javascript" src="{% static 'grid/js/app/index.js' %}"></script>
+	<!-- <script type="text/javascript" src='{% static 'grid/js/app/gridding.js' %}'></script> -->
+	<script type="text/javascript" src='{% static 'grid/js/app/model.js' %}'></script>
+	<script type="text/javascript" src='{% static 'grid/js/app/page.js' %}'></script>
+	<!-- <script type="text/javascript" src='{% static 'grid/js/app/Widget.js' %}'></script> -->
 
-	<script type="text/javascript" src="{% static 'grid/js/jquery.gridster.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'grid/js/jquery.isotope.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'grid/js/jquery.imagesloaded.min.js' %}"></script>
-	<script type="text/javascript" src='{% static 'grid/js/hammer.js' %}'></script>
 	<!-- <script type="text/javascript" src='{% static 'grid/js/index.js' %}'></script>
 	<script type="text/javascript" src='{% static 'grid/js/Widget.js' %}'></script>
 	<script type="text/javascript" src='{% static 'grid/js/Weather-widget.js' %}'></script> -->
