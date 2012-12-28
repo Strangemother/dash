@@ -10,6 +10,8 @@ class Widget(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     version = models.CharField(max_length=20, null=True, blank=True)
 
+    def __unicode__(self):
+        return '%s, active: %s - version: %s' % (self.name, self.active, self.version)
     def manifest(self):
         ''' 
         Retuns a module of the manifest file, ready as an import of 'manifest'

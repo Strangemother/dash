@@ -6,12 +6,16 @@ import random
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
+
+
 def context(request):
     c = {}
     return c
 
+
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
+
 
 def list(request):
     if request.method == 'POST':
@@ -36,6 +40,7 @@ def list(request):
         {'form': form, 'widgets': widgets},
         context_instance=RequestContext(request)
     )
+
 
 def page(request, name):
     c= {}
