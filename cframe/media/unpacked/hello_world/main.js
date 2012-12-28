@@ -1,7 +1,6 @@
 
 WIDGET = {
     /* By default this is true unless set false */
-    
     name: 'Hello World',
     closedIcon: '/static/img/icons/hello.svg',
     closedText: 'Hello',

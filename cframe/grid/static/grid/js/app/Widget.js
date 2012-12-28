@@ -2,6 +2,10 @@
 Widget = function () {
     var self = {};
 
+    self.jsonGet = function(){
+        return 
+    }
+
 
     self.init = function(){
         self._grid = arg(arguments, 0, null);
@@ -44,6 +48,9 @@ Widget = function () {
 
             //Color of the text when the widgets backgroound is in high contrast mode.
             darkTextColor: '#333',
+
+            // require.js dependency injection.
+            dependencies: [],
 
             /* if multiple icons are set for open or closed, define the
             length in ms for cycling between icons 
@@ -172,6 +179,25 @@ Widget = function () {
     }
 
 
+    /*
+    Display a state of highlight by colouring the objects 
+    background
+    */
+    self.toggleHighlight = function(){
+        var initStateValue = arg(arguments, 0, 1);
+        var mod = self.store.getCreate('toggleHighlight', initStateValue);
+        var val = self.store.set('toggleHighlight', mod+=1);
+
+        if(mod % 2 == 0) {
+            self.backgroundColor(self.options.highlightColor);
+        }
+        else 
+        {
+            self.backgroundColor(self.options.backgroundColor);
+        }
+    }
+
+
     // Add this to the grid that is passed 
     // or was passed in instantiation.
     self.addToGrid = function() {
@@ -182,7 +208,7 @@ Widget = function () {
             var html = self.html();
             self.element = grid.add_widget(html)
             // self.element.opacity(.5)
-            
+            self.backgroundColor(self.options.backgroundColor);
             // Click Handler
             self.element.click(function(e){
                 self.options.onClick.call(self, e, self.options);
@@ -192,43 +218,44 @@ Widget = function () {
                 self.options.onDoubleClick.call(self, e, self.options);
             });
 
-
-
-            self.store = {};
-            self.store.set = function(key, value){
-                Sadie.model.addToSpace(self.options.name, key, value);
-                return value;
-            }
-
-            self.store.has = function(key) {
-                var k= '';
-                for (var i in Sadie.model.spaceData) {
-                    k = self.options.name + '-' + key;
-                    if(i ==k) {
-                        return true;
-                    }
-                };
-
-                return false;
-            }
-
-            self.store.getCreate = function(key, value) {
-                var val = Sadie.model.getFromSpace(self.options.name, key);
-                if(val == undefined) {
+            self.store = {
+                'set': function(key, value){
                     Sadie.model.addToSpace(self.options.name, key, value);
                     return value;
-                };
-                return val;
+                },
+
+                'has': function(key) {
+                    var k= '';
+                    for (var i in Sadie.model.spaceData) {
+                        k = self.options.name + '-' + key;
+                        if(i ==k) {
+                            return true;
+                        }
+                    };
+
+                    return false;
+                },
+
+                'getCreate': function(key, value) {
+                    var val = Sadie.model.getFromSpace(self.options.name, key);
+                    if(val == undefined) {
+                        Sadie.model.addToSpace(self.options.name, key, value);
+                        return value;
+                    };
+                    return val;
+                },
+
+                'get': function(key){
+                    var returnVal = arg(arguments, 1, null);
+                    var val = Sadie.model.getFromSpace(self.options.name, key);
+                    if(val == undefined) {
+                        return returnVal;
+                    };
+                    return val;
+                }
             }
 
-            self.store.get = function(key){
-                var returnVal = arg(arguments, 1, null);
-                var val = Sadie.model.getFromSpace(self.options.name, key);
-                if(val == undefined) {
-                    return returnVal;
-                };
-                return val;
-            }
+
         }
 
 
@@ -272,25 +299,8 @@ Widget = function () {
 
     }
 
-    /*
-    Display a state of highlight by colouring the objects 
-    background
-    */
-    self.toggleHighlight = function(){
-        var mod = self.store.getCreate('toggleHighlight', 1);
-        var val = self.store.set('toggleHighlight', mod+=1);
-
-        if(mod % 2 == 0) {
-            self.backgroundColor(self.options.highlightColor);
-        }
-        else 
-        {
-            self.backgroundColor(self.options.backgroundColor);
-        }
-    }
-
     self.showOpenState = function(){
-        //debugger;
+
         self.height(self.options.openHeight);
         self.width(self.options.openWidth);
         // self.text() returns jquery element
@@ -299,12 +309,20 @@ Widget = function () {
         self.text().text(self._openText || self.text().text() || self.options.openText);
         self.closed = false;
         self.open = true;
-        self.icon(self.options.openIcon)
+    
+        self.icon(self.options.openIcon);
+        self.showPage(self.options.name);
         self.options.openHandler.apply(self)
+        
         return self;
     }
 
     self.showClosedState = function(){
+       
+        if(self._pagevisble == true) {
+            $(self.element).find('iframe').hide();
+            self._pagevisble = false;
+        }
         self.width(self.options.closedWidth);
         self.height(self.options.closedHeight);
         //self.icon()[0].src = self.closedIconUrl();
@@ -313,9 +331,76 @@ Widget = function () {
         self.closed = true;
         self.icon(self.options.closedIcon)
         self.open = false;
-        self.options.closedHandler()
+        self.options.closedHandler();
         return self;
     }
+
+    self.showPage = function(appname) {
+        if(self.open == true) {
+            // Make server request to show the requested page.
+            self.getOpenHtml({
+                appname: appname,
+                assetPath: ''
+            }, self.getOpenHtmlReceiver)
+        }
+    }
+
+    self.pageLoadHandler = function() {
+        console.log('pageLoadHandler');
+    }
+
+    self.getOpenHtml = function(context) {
+        // get request
+        var url = 'widget/page/' + context.appname + '/';
+        jsonResponse(url, 'GET', {}, function(data){
+            // data received from endpoint.
+            // load asset path into view.
+            self.getOpenHtmlReceiver.call(self, context, data)
+        })
+    }
+
+    self.getOpenHtmlReceiver = function(context, data){
+        // Receive data; present to 
+        // create iframe, 
+        // change interface style.
+        // render site
+        if($(self.element).find('iframe#' + self.options.name + '_page').length <= 0)  {
+            // Create the iframe if it does not exist.
+            $(self.element).uiji('iframe{id=' + context.appname +'_page}', function(){
+                $(this).hide()
+             
+                $(this).load(function(){
+                    self.pageLoadHandler();
+                    $(this).contents().find('.close').click(function(){
+                        self.showClosedState();
+                    });
+                    $(this).delay(200).fadeIn(function(){
+                        self._pagevisble = true;
+                    });
+                })
+
+                self.iframeUrl('/widget/page/' + context.appname + '/', this);
+                
+            });
+        } else {
+            self.iframeUrl('/widget/page/' + context.appname + '/');
+            $(self.element).find('iframe').show();
+            self._pagevisble = true;
+        }
+    }
+
+    self.iframeUrl = function(url){
+        var _iframe = $(self.element).find('iframe#' + self.options.name + '_page');
+        if(_iframe.length > 0) {
+            _iframe = null;
+        }
+        var iframe = arg(arguments, 1, _iframe);
+
+        if(iframe) {
+            iframe.src = url;
+        }
+    }
+
 
     self.iconColor = function(){
         self.options.closedIconColor = arg(arguments, 0, self.options.closedIconColor)

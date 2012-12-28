@@ -5,6 +5,9 @@ from models import Widget
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
+def context(request):
+    c = {}
+    return c
 
 def list(request):
     if request.method == 'POST':
@@ -23,6 +26,17 @@ def list(request):
         {'form': form, 'widgets': widgets},
         context_instance=RequestContext(request)
     )
+
+def page(request, name):
+    c= {}
+
+    c['widgets'] = Widget.objects.filter(active=True)
+    
+    template = '%s/templates/main.html' % (name)
+    return render_to_response(template, c, 
+                              context_instance=RequestContext(request, 
+                                                        processors=[context]))
+
 
 def install_widget(widget):
     pass

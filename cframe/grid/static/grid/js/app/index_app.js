@@ -20,9 +20,29 @@ registerWidget = function (widgetData){
     Provide a scope to the widget.
     */
     var f = function(widgetData){
+        var _w = widgetData;
+        if(typeof(widgetData) == 'function') {
+            // execute function passing context of paths and data
+            context = {
+                // mapped store procedure
 
-        define(['app/Widget'], function(){ 
-            return widgetData;
+                // path for icons
+                assetPath: '/media/unpacked/add/icons/'
+                // enpoint path
+            };
+            _w = widgetData(context);
+        }
+        var dependencies = ['app/Widget'];
+        
+        // Push user defined dependencies (if any) into a stack to be called.
+        // Cool huh! Depedencies . O.o...
+        var _access = _w.dependencies || [];
+        for (var i = 0; i < _access.length; i++) {
+            dependencies.push(_access[i]);
+        };
+
+        define(dependencies, function(){
+            return _w;
         })
     }
 

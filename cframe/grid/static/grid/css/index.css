@@ -1,3 +1,7 @@
+body {
+    /* background: url('/static/grid/img/bg.jpg'); */
+}
+
 .gs_w {
 	border: solid 2px;
 	list-style: none;
@@ -22,6 +26,17 @@
 	margin: 5px;
 }
 
+.gridster ul li iframe {
+	width: 100%;
+	border: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	background: rgba(255, 255, 255, .94);
+	padding: 0;
+}
+
 .content_1 {
 	color: #999;
 	text-align: center;
@@ -43,7 +58,7 @@ margin-bottom: 10px;
 	text-align: center;
 	width: 80%;
 	margin: 10%;
-	margin-top: 0;
+	/* margin-top: 0; */
 	margin-bottom: 10px;
 	text-shadow: 0 1px 1px #999;
 }

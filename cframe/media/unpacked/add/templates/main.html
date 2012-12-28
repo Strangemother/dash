@@ -1,0 +1,14 @@
+
+{% extends 'grid/widget-frame.html' %}
+{% block page %}
+    <div class="main">
+        <h1>Add a widget</h1>
+        <ol class="buttons">
+            {% for widet in widgets %}
+            <li>
+                <a href="javascript:;" class='interface-button eq0'>{{ widget }}</a>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+{% endblock %}

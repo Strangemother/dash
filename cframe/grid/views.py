@@ -17,9 +17,6 @@ def context(request):
 # 
 def home(request):
     c = {}
-
-    c['widgets'] = Widget.objects.filter(active=True)
-
     return render_to_response('grid/index.html', c, 
                               context_instance=RequestContext(request, 
                                                         processors=[context]))

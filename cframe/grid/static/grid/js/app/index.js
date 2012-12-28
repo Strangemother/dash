@@ -5,6 +5,10 @@ $(document).ready(function(){
 
     page.appendWidgets(['add']);
 
+    if(page.__interfaceButtons.length <= 0) {
+        $('.add-button').hide();
+    }
+    
     $('.add-button').click(function(){
         $('.tools').show();
     });

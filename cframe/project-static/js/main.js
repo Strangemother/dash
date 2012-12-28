@@ -1,5 +1,76 @@
 
 
+/**
+ * Param: URL, [successFunction, failFunction]
+ */
+jsonResponse = function() {
+
+        //console.log('Making ajax call');
+        
+        
+        //console.log(arguments)
+
+        var url = arguments[0]
+        var method = arguments[1] || 'GET'
+        
+        var data = arguments[2] || {}
+        var successFunction = arguments[3]
+        var failFunction = arguments[4]
+        
+        if(typeof(method) == 'function') {
+        data = {}
+        failFunction= successFunction
+        successFunction = method
+        methdod = 'GET'     
+        }
+        //console.log(arguments[0])
+        
+        $.ajax({
+          url: url,
+          type: method,
+          data: data,
+          context: document.body,
+          success: function(data){;
+                //console.log(data['success'])
+                var obj = data
+                try {
+                        obj = $.parseJSON(data);
+                } catch(e) {
+                        // not json?
+                }
+                
+                //console.log("Return data = ", obj)
+                var dataParse = data;
+                
+                if(obj){
+                        dataParse = obj;
+                };
+                
+                var success = dataParse['success'];
+                
+                if(!success) {
+                        // console.log("Success failed.");
+                        
+                        //Alert user with the failure.
+                }
+                if(successFunction){
+                        try {
+                                //console.log("Ajax call was successful")
+                        } catch(e) {}
+                        
+                        successFunction(data, dataParse)
+                }
+          },
+          fail: function(data){
+                console.log("A fail has occured with ajax request")
+          },
+          error: function(data){
+                console.log("An error has occured with ajax request", data)
+          } 
+        });
+}
+
+
 /*
  * A little help function for when I'm creating functions
  *
@@ -137,7 +208,12 @@ Color = (function() {
 				temp = /^([a-f0-9])([a-f0-9])([a-f0-9])$/i.exec(temp).slice(1);
 			    for (var i=0;i<3;i++) hex+=temp[i]+temp[i];
 			 }
-			 var triplets = /^([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i.exec(hex).slice(1);
+			 var triplets = /^([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i.exec(hex)
+             if(triplets == null) {
+                triplets = tripletshex=hex.substr(1);
+                return null;
+             }
+
 			 return [ parseInt(triplets[0],16),
 				 	parseInt(triplets[1],16),
 				 	parseInt(triplets[2],16)

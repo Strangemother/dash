@@ -16,16 +16,11 @@ gridding.addWidget = function(){
    
     var gridster = $(".gridster ul").gridster().data('gridster');  
     if(typeof(widget) == 'string') {
-        // Start the main app logic.
+       
         require(['widget/'+ widget +'/main'],
             function (widget) {
-                //jQuery, canvas and the app/sub module are all
-                //loaded and can be used here now.
-                console.log("Add after requiest");
-                debugger
-                // what is scope here.
-                // make cstome scope.
-                wid = Widget(gridster, widget);
+                var scope = function(){}
+                wid = Widget.call(scope, gridster, widget);
                 wid.addToGrid();
          });
     } else {

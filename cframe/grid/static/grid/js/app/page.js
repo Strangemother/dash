@@ -20,7 +20,11 @@ page.appendWidget = function() {
         return false;
     }
 
-    page.createInterfaceButton(widgetData)
+    require(['gridding'], function(){
+        gridding.addWidget(widgetData);
+        //gridding.createGrid(gridding.layout());
+    });
+    //page.createInterfaceButton(widgetData)
     return true;
 }
 
@@ -151,6 +155,7 @@ page.touchHandler = function(ev) {
     };
 }
 
+page.__interfaceButtons = []
 
 page.createInterfaceButton = function(){
     var widgetData = arg(arguments, 0, null);
@@ -159,6 +164,7 @@ page.createInterfaceButton = function(){
     $('div.tools ul').uiji('li', function(){
         var name =  (widgetData.name || widgetData).replace('_', ' ');
         $(this).uiji('a{href=javascript:;}.interface-button"' + name + '"', function(){
+            page.__interfaceButtons.push([this, widgetData]);
             $(this).click(function(){
                 console.log("createInterfaceButton");
                 gridding.addWidget(widgetData);
