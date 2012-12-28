@@ -6,7 +6,7 @@
         <ol class="buttons">
             {% for widget in widgets %}
             <li>
-                <a href="javascript:;" class='interface-button eq0'>{{ widget.name }}</a>
+                <a href="javascript:;" data-path="{{ widget.path }}" data-pk='{{ widget.pk }}' data-endpoint='{{ widget.unpack }}' data-name='{{ widget.name }}' class='widget-interface-button eq0'>{{ widget.name }}</a>
             </li>
             {% endfor %}
         </ol>

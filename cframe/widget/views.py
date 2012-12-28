@@ -3,10 +3,11 @@ from forms import WidgetForm
 from models import Widget
 import string
 import random
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, HttpResponse
 from django.template import RequestContext
 from django.conf import settings
-
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
 
 def context(request):
     c = {}
@@ -48,6 +49,12 @@ def page(request, name):
     c['widgets'] = Widget.objects.filter(active=True)
     
     template = '%s/templates/main.html' % (name)
+    
+    try:
+        get_template(template)
+    except TemplateDoesNotExist:
+        return HttpResponse('')
+        
     return render_to_response(template, c, 
                               context_instance=RequestContext(request, 
                                                         processors=[context]))

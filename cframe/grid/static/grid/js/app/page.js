@@ -20,10 +20,31 @@ page.appendWidget = function() {
         return false;
     }
 
-    require(['gridding'], function(){
-        gridding.addWidget(widgetData);
-        //gridding.createGrid(gridding.layout());
-    });
+    // make a call to the model for a pk's path to main.js
+    // WidgetData: pk
+    if(widgetData.hasOwnProperty('path')) {
+        // impoer main.js from path point
+        // as widget name 
+
+        // name of widget
+        var name = widgetData['name'];
+        var path = '/media/unpacked/' + widgetData['path'] + '/main.js'
+        require([path, 'gridding'], function(widgetData){
+            // widget lib importedrequire(['gridding'], function(){
+            gridding.addWidget(widgetData);
+            //gridding.createGrid(gridding.layout());
+        });
+        
+    } else {
+        // make call - receive endpoint.
+        // add to require masking extension random id to api call
+
+        require(['gridding'], function(){
+            gridding.addWidget(widgetData);
+            //gridding.createGrid(gridding.layout());
+        });
+        
+    }
     //page.createInterfaceButton(widgetData)
     return true;
 }

@@ -8,10 +8,18 @@ registerWidget(function(context){
         openIcon: context.assetPath + 'add.svg',
         openText: 'New Widget.',
         highlightColor: '#3CA24C',
-
-        visibleHandler: function(){
+        openHandler: function(){
+        },
+        pageLoadHandler: function(element){
             //page.fullalert('Add or upload a widget to use on the dash',
                 //'A second line.' , 'creation.svg')
+            $(element).find('.widget-interface-button').die('click').click(function(){
+                // add widget
+                Sadie.page.appendWidget({pk: $(this).data('id'),
+                                        path: $(this).data('path'),
+                                        name: $(this).data('name')})
+                
+            })
         },
         touchHandler: function(ev){
             if(ev.type != 'release') {
@@ -23,7 +31,7 @@ registerWidget(function(context){
             }
         },
         onClick: function(event, options) {
-            this.toggleHighlight()
+            this.toggleHighlight();
         },
         onDoubleClick: function(event, options) {
             this.toggleState();

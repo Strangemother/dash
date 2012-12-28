@@ -70,6 +70,9 @@ Widget = function () {
             onDoubleClick: function(event, options) {
                 this.toggleState();
             },
+            pageLoadHandler: function(element){
+
+            },
             visibleHandler: function(){
                 console.log("visible");
 
@@ -218,6 +221,8 @@ Widget = function () {
                 self.options.onDoubleClick.call(self, e, self.options);
             });
 
+            self.pageLoadHandler = self.options.pageLoadHandler;
+
             self.store = {
                 'set': function(key, value){
                     Sadie.model.addToSpace(self.options.name, key, value);
@@ -345,7 +350,7 @@ Widget = function () {
         }
     }
 
-    self.pageLoadHandler = function() {
+    self.pageLoadHandler = function(element) {
         console.log('pageLoadHandler');
     }
 
@@ -364,18 +369,23 @@ Widget = function () {
         // create iframe, 
         // change interface style.
         // render site
-        if($(self.element).find('iframe#' + self.options.name + '_page').length <= 0)  {
+
+        if(
+            ($(self.element).find('iframe#' + self.options.name + '_page').length <= 0) &&
+            (data != '') )  {
             // Create the iframe if it does not exist.
             $(self.element).uiji('iframe{id=' + context.appname +'_page}', function(){
                 $(this).hide()
              
                 $(this).load(function(){
-                    self.pageLoadHandler();
+
                     $(this).contents().find('.close').click(function(){
                         self.showClosedState();
                     });
                     $(this).delay(200).fadeIn(function(){
                         self._pagevisble = true;
+                        // Pass the iframe as the arg. Which is nice.
+                        self.pageLoadHandler($(this).contents());
                     });
                 })
 

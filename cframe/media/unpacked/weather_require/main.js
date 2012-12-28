@@ -3,7 +3,7 @@ WIDGET = {
     closedIcon: '/static/img/icons/weather.svg',
     closedText: 'Weather Widget',
     closedIconColor: '#CCCCCC',
-    highlightColor: '#333',
+    highlightColor: 'rgba(77, 170, 255, 0.41)',
     openHeight: 1,
     openWidth: 3,
     config: {
@@ -68,10 +68,8 @@ WIDGET = {
             { id: 47, detail: "isolated thundershowers", icon: ASSET_IMG_URL + "++.svg" },
             { id: 3200, detail: "not available", icon: ASSET_IMG_URL + "++.svg" }
         ]
-    },
+    }, 
     visibleHandler: function(){
-        console.log("visible");
-        debugger;
         if(!this.store.has('weather')) {
             this.options.getWeather.apply(this)
         }
