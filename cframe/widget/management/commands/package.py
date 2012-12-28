@@ -43,7 +43,7 @@ class Command(BaseCommand):
         self.overwrite = options.get('overwrite')
         self.verbose = options.get('verbose')
         self.filename = options.get('filename')
-
+                             
 
         if self.filename is None:
             try:

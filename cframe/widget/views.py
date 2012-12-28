@@ -20,9 +20,12 @@ def list(request):
             widget_file = request.FILES['widget_file']
             wid = Widget(widget_file=widget_file)
             wid.save()
+
             root = settings.PROJECT_ROOT
-            nid = '%s/media/unpacked/%s/' (root, id_generator() )
-            wid.unpack(nid)
+            nid = '%s/media/unpacked/%s' % (root, id_generator())
+            wid.unpack = nid
+            wid.save()
+            wid.unpack_file(nid)
     else:
         form = WidgetForm()
 
