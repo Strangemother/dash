@@ -1,13 +1,17 @@
 # Create your views here.
 from forms import WidgetForm
 from models import Widget
-
+import string
+import random
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-
+from django.conf import settings
 def context(request):
     c = {}
     return c
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
 
 def list(request):
     if request.method == 'POST':
@@ -16,6 +20,9 @@ def list(request):
             widget_file = request.FILES['widget_file']
             wid = Widget(widget_file=widget_file)
             wid.save()
+            root = settings.PROJECT_ROOT
+            nid = '%s/media/unpacked/%s/' (root, id_generator() )
+            wid.unpack(nid)
     else:
         form = WidgetForm()
 
