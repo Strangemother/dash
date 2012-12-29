@@ -3,8 +3,8 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>Iframe content</title>
-    {% block header_css %}
+    <title>Iframe {{widget}}</title>
+{% block header_css %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'grid/css/widget.css' %}">
 {% endblock header_css %}

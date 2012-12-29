@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
+import os
 
 def context(request):
     c = {}
@@ -45,16 +46,20 @@ def list(request):
 
 def page(request, name):
     c= {}
-
     c['widgets'] = Widget.objects.filter(active=True)
-    
+    ws = Widget.objects.filter(name=name)
+    if len(ws) >= 1:
+        w = ws[0]
+        c['widget'] = w
+        c['path'] = '/media/unpacked/%s' % w.name
+
     template = '%s/templates/main.html' % (name)
     
     try:
-        get_template(template)
+        get_template(template) 
     except TemplateDoesNotExist:
         return HttpResponse('')
-        
+
     return render_to_response(template, c, 
                               context_instance=RequestContext(request, 
                                                         processors=[context]))

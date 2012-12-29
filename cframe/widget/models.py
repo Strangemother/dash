@@ -6,19 +6,20 @@ from django.core.exceptions import ValidationError
 
 # Create your models here.
 class Widget(models.Model):
+    name = models.CharField(max_length=255, null=True, blank=True, 
+        help_text='Friendly name of the widget')
     widget_file = models.FileField(upload_to='widgets', null=True, blank=True,
         help_text='The file to unpack when creating this widget')
     active = models.BooleanField(blank=True, default=True,
         help_text='Select if this widget is active')
     unpack = models.CharField(max_length=255, null=True, blank=True,
         help_text='the root location of the wisget (to manifest.py)')
-    name = models.CharField(max_length=255, null=True, blank=True, 
-        help_text='Friendly name of the widget')
     version = models.CharField(max_length=20, null=True, blank=True,
         help_text='Author widget version for upgrade assistance')
     path = models.CharField(max_length=255, null=True, blank=True,
         help_text='pseudo path to extension for use with importing')
-    
+    icon = models.CharField(max_length=255, null=True, blank=True,
+        help_text='relative public path of icon to use for image data')
     locked = models.BooleanField(blank=True, default=True,
         help_text='Lock to ensure a delete procedure does not destroy files (good for dev)')
 

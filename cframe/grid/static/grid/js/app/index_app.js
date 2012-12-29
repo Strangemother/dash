@@ -11,7 +11,7 @@ requirejs.config({
         'widget': '/media/unpacked'
     }
 });
-
+ 
 registerWidget = function (widgetData){
     /*method used to import a Custom widget through require.js*/
     //also scoped
@@ -25,8 +25,6 @@ registerWidget = function (widgetData){
             // execute function passing context of paths and data
             context = {
                 // mapped store procedure
-
-                // path for icons
                 assetPath: '/media/unpacked/add/icons/'
                 // enpoint path
             };

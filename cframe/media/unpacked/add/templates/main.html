@@ -1,5 +1,9 @@
 
 {% extends 'grid/widget-frame.html' %}
+{% block header_css %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{{ path }}/css/main.css" media="all">
+{% endblock %}
 {% block page %}
     <div class="main">
         <h1>Add a widget</h1>
