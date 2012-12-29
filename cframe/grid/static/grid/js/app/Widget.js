@@ -14,6 +14,7 @@ Widget = function () {
         self._closedIcons = [];
         self._color = null;
         self.element = null;
+        self.manifest = {}
         self.options = {
 
             // Color of the background.
@@ -105,8 +106,19 @@ Widget = function () {
 
         //debugger;
         self.renderoptions()
-
+        // fetch and load manifest
+        
+        self.loadManifest(self.options.name)
         return self;
+    }
+
+    self.loadManifest = function(name) {
+        // load a manifest file into this class as a dictionary of data.
+        var url = '/widget/manifest/' + name + '/';
+        jsonResponse(url, 'GET', {}, function(data){
+            data = JSON.parse(data)[0]
+            self.manifest = data;
+        })
     }
 
     self.renderoptions = function(){
@@ -395,6 +407,9 @@ Widget = function () {
         } else {
             self.iframeUrl('/widget/page/' + context.appname + '/');
             $(self.element).find('iframe').show();
+            if(self.dev == true) {
+                $(self.element).find('iframe').contents()[0].location.reload(true);
+            }
             self._pagevisble = true;
         }
     }

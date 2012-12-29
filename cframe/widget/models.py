@@ -51,7 +51,9 @@ class Widget(models.Model):
         # the same method used for implemented a newly uploaded widget
 
         # create and check url
-        p = os.path.join(self.unpack, self.name, 'manifest.py')
+        p = os.path.join(self.unpack, 'manifest.py')
+        if self.path != os.path.basename(self.unpack):
+            p = os.path.join(self.unpack, self.name, 'manifest.py')
         return imp.load_source('manifest', p)
 
 

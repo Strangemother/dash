@@ -9,6 +9,7 @@ from django.conf import settings
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 import os
+from cframe.serializers import json_response
 
 def context(request):
     c = {}
@@ -64,6 +65,22 @@ def page(request, name):
                               context_instance=RequestContext(request, 
                                                         processors=[context]))
 
+def manifest(request, name):
+
+    ws = Widget.objects.filter(name=name)
+    w = None
+    c = {}
+    if len(ws) >= 1:
+        w = ws[0]
+    
+    if w is not None:
+        manifest = w.manifest()
+        
+        for v in dir(manifest):
+            if not v.startswith('__'):
+                c[v] = manifest.__dict__.get(v)
+    
+    return json_response(c)
 
 def install_widget(widget):
     pass
