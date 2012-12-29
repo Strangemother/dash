@@ -14,7 +14,9 @@ Widget = function () {
         self._closedIcons = [];
         self._color = null;
         self.element = null;
-        self.manifest = {}
+        self.manifest = {};
+        // Hold the iframe page
+        self.currentPage = null;
         self.options = {
 
             // Color of the background.
@@ -369,6 +371,7 @@ Widget = function () {
     self.getOpenHtml = function(context) {
         // get request
         var url = 'widget/page/' + context.appname + '/';
+
         jsonResponse(url, 'GET', {}, function(data){
             // data received from endpoint.
             // load asset path into view.
@@ -397,7 +400,8 @@ Widget = function () {
                     $(this).delay(200).fadeIn(function(){
                         self._pagevisble = true;
                         // Pass the iframe as the arg. Which is nice.
-                        self.pageLoadHandler($(this).contents());
+                        self.currentPage = $(this).contents();
+                        self.pageLoadHandler(self.currentPage);
                     });
                 })
 

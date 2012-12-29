@@ -48,15 +48,15 @@ WIDGET = {
             { id: 27, detail: "mostly cloudy (night)", icon: ASSET_IMG_URL + "day-cloud.svg" },
             { id: 28, detail: "mostly cloudy (day)", icon: ASSET_IMG_URL + "day-cloud-2.svg" },
             { id: 29, detail: "partly cloudy (night)", icon: ASSET_IMG_URL + "day-cloud.svg" },
-            { id: 30, detail: "partly cloudy (day)", icon: ASSET_IMG_URL + "day-cloud++.svg" },
+            { id: 30, detail: "partly cloudy (day)", icon: ASSET_IMG_URL + "day-cloud.svg" },
             { id: 31, detail: "clear (night)", icon: ASSET_IMG_URL + "++.svg" },
             { id: 32, detail: "sunny", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 33, detail: "fair (night)", icon: ASSET_IMG_URL + "++.svg" },
+            { id: 33, detail: "fair (night)", icon: ASSET_IMG_URL + "day-cloud.svg" },
             { id: 34, detail: "fair (day)", icon: ASSET_IMG_URL + "++.svg" },
             { id: 35, detail: "mixed rain and hail", icon: ASSET_IMG_URL + "++.svg" },
             { id: 36, detail: "hot", icon: ASSET_IMG_URL + "++.svg" },
             { id: 37, detail: "isolated thunderstorms", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 38, detail: "scattered thunderstorms", icon: ASSET_IMG_URL + "++.svg" },
+            { id: 38, detail: "scattered thunderstorms", icon: ASSET_IMG_URL + "rain-and-thunder-storm.svg" },
             { id: 39, detail: "scattered thunderstorms", icon: ASSET_IMG_URL + "++.svg" },
             { id: 40, detail: "scattered showers", icon: ASSET_IMG_URL + "++.svg" },
             { id: 41, detail: "heavy snow", icon: ASSET_IMG_URL + "++.svg" },
@@ -144,14 +144,18 @@ WIDGET = {
             "windDirecton": feed.wind.direction,
             "todayForcast": feed.item.forecast[0],
             "tomorrowForcast": feed.item.forecast[1],
+            'sunrise': feed.astronomy.sunrise,
+            'sunset': feed.astronomy.sunset,
             "condition": feed.item.condition,
             "location": feed.location,
             "wpd": feed.item.pubDate,
-            "condCode": feed.item.condition.code
+            "condCode": feed.item.condition.code,
+            "units": feed.units
         }
         
         this.store.set('weather', weather)
         
+
 
         this.text().text(weather.condition.text)
         var unit = ' &#8457;';
@@ -173,10 +177,55 @@ WIDGET = {
             }
         };
 
+        if(pageVisible) {
+            this.options.renderPage.apply(this, this.currentPage)
+        }
         this.hideLoader.call(this, 'getWeather');
-    }, 
-    closedHandler: function() {
+    },
+    renderPage: function(element) {
+        // pass a jquery iframe element (a page)
+        if(!this.store.has('weather')) {
+            this.options.getWeather.apply(this)
+        }
 
+        w = this.store.get('weather');
+        
+        element.find('.city').text(w.location.city)
+        element.find('.country').text(w.location.country)
+    
+        var unit = ' &#8457;';
+        if(w.units.temperature == 'C') {
+            unit =  '&deg;';
+        }
+
+        element.find('.today .icon img')[0].src = this.options.config.conditionMap[w.condition.code].icon;
+        element.find('.today .text').text(w.condition.text)
+        element.find('.today .temp').html(w.condition.temp + '' + unit)
+
+        // element.find('.atmos .sunrise .icon img')[0].src = this.options.config.conditionMap[w.todayForcast.code].icon;
+        element.find('.atmos .sunrise .text').text(w.sunrise)
+        element.find('.atmos .sunset .text').text(w.sunset)
+
+        element.find('.forecast .first .day').text(w.todayForcast.day)
+        element.find('.forecast .second .day').text(w.tomorrowForcast.day)
+
+        
+        element.find('.forecast .first .text').text(w.todayForcast.text)
+        element.find('.forecast .second .text').text(w.tomorrowForcast.text)
+
+        element.find('.forecast .first .icon img')[0].src = this.options.config.conditionMap[w.todayForcast.code].icon
+        element.find('.forecast .second .icon img')[0].src = this.options.config.conditionMap[w.tomorrowForcast.code].icon
+
+        element.find('.date').text(w.wpd)
+    },
+    pageLoadHandler: function(element) {
+        // project javascript hook
+        pageVisible = true;
+        var el = $(element)
+        this.options.renderPage.call(this, el);
+    },
+    closedHandler: function() { 
+        pageVisible = false;
     },
     openHandler: function(){
         console.log('loaded weather')

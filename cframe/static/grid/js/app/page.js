@@ -20,7 +20,32 @@ page.appendWidget = function() {
         return false;
     }
 
-    page.createInterfaceButton(widgetData)
+    // make a call to the model for a pk's path to main.js
+    // WidgetData: pk
+    if(widgetData.hasOwnProperty('path')) {
+        // impoer main.js from path point
+        // as widget name 
+
+        // name of widget
+        var name = widgetData['name'];
+        var path = '/media/unpacked/' + widgetData['path'] + '/main.js'
+        require([path, 'gridding'], function(widgetData){
+            // widget lib importedrequire(['gridding'], function(){
+            gridding.addWidget(widgetData);
+            //gridding.createGrid(gridding.layout());
+        });
+        
+    } else {
+        // make call - receive endpoint.
+        // add to require masking extension random id to api call
+
+        require(['gridding'], function(){
+            gridding.addWidget(widgetData);
+            //gridding.createGrid(gridding.layout());
+        });
+        
+    }
+    //page.createInterfaceButton(widgetData)
     return true;
 }
 
@@ -151,14 +176,18 @@ page.touchHandler = function(ev) {
     };
 }
 
+page.__interfaceButtons = []
 
 page.createInterfaceButton = function(){
     var widgetData = arg(arguments, 0, null);
 
     // <li><a href='javascript:;' id='createWeatherWidget'>Weather</a></li>
     $('div.tools ul').uiji('li', function(){
-        $(this).uiji('a{href=javascript:;}.interface-button"' + (widgetData.name || widgetData)  + '"', function(){
+        var name =  (widgetData.name || widgetData).replace('_', ' ');
+        $(this).uiji('a{href=javascript:;}.interface-button"' + name + '"', function(){
+            page.__interfaceButtons.push([this, widgetData]);
             $(this).click(function(){
+                console.log("createInterfaceButton");
                 gridding.addWidget(widgetData);
             })
         })

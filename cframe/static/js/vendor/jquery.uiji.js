@@ -25,7 +25,7 @@ var uiji = function(input, func) {
             $.each(queryA, function(index, query) {
                 var infoC = {
                     tag: ''
-                },
+                }, b
                 isAttrKey = false,
                     prop = 'tag',
                     attrKey = '';

@@ -49,17 +49,19 @@ def page(request, name):
     c= {}
     c['widgets'] = Widget.objects.filter(active=True)
     ws = Widget.objects.filter(name=name)
+    print len(ws)
     if len(ws) >= 1:
         w = ws[0]
         c['widget'] = w
-        c['path'] = '/media/unpacked/%s' % w.name
+        c['path'] = '/media/unpacked/%s' % w.path
 
-    template = '%s/templates/main.html' % (name)
-    
-    try:
-        get_template(template) 
-    except TemplateDoesNotExist:
-        return HttpResponse('')
+        template = '%s/media/unpacked/%s/templates/main.html' % (settings.PROJECT_ROOT, w.path)
+
+        try:
+            get_template(template) 
+        except TemplateDoesNotExist:
+            print 'missing template', template
+            return HttpResponse('')
 
     return render_to_response(template, c, 
                               context_instance=RequestContext(request, 
