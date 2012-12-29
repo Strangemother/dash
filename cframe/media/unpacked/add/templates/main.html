@@ -10,6 +10,7 @@
         <ol class="buttons">
             {% for widget in widgets %}
             <li>
+                <img src="{% if widget.icon %}{{ widget.icon }}{% else %}{{ path }}/icons/star.svg{% endif %}" alt="">
                 <a href="javascript:;" data-path="{{ widget.path }}" data-pk='{{ widget.pk }}' data-endpoint='{{ widget.unpack }}' data-name='{{ widget.name }}' class='widget-interface-button eq0'>{{ widget.name }}</a>
             </li>
             {% endfor %}

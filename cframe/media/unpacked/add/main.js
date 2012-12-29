@@ -13,16 +13,18 @@ registerWidget(function(context){
         pageLoadHandler: function(element){
             //page.fullalert('Add or upload a widget to use on the dash',
                 //'A second line.' , 'creation.svg')
-            debugger;
-            var self = this;
-            $(element).find('.widget-interface-button').die('click').click(function(){
-                // add widget
-                debugger;
-                Sadie.page.appendWidget({pk: $(this).data('id'),
+            $(element).find('.widget-interface-button').die('click').bind('click', {
+                parent: this
+            }, 
+                function(event){
+                    // add widget
+                    event.data.parent.showClosedState()
+    
+                    Sadie.page.appendWidget({pk: $(this).data('id'),
                                         path: $(this).data('path'),
                                         name: $(this).data('name')})
                 
-            })
+                })
         },
         touchHandler: function(ev){
             if(ev.type != 'release') {

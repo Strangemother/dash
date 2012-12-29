@@ -81,12 +81,17 @@ class Widget(models.Model):
         # Read manifest file of each folder in tar
         manifests = self.find_manifests(to_folder)
         if len(manifests) >= 1:
+            path = '%s/%s' % (os.path.basename(to_folder), manifests[0][0])
             imp.load_source('manifest', manifests[0][1])
             import manifest
+            man = manifest.__dict__.get
             fn = os.path.basename(os.path.dirname(manifests[0][1]))
-            self.name = manifest.__dict__.get('NAME', fn)
-            self.version = manifest.__dict__.get('VERSION', None)
+            self.name = man('NAME', fn)
+            self.version = man('VERSION', None)
+            icon = man('ICON', None)
 
+            if icon is not None:
+                self.icon = '/media/unpacked/%s/%s' % (path, icon) 
 
         # Save the unpack location to the model
         self.unpack = to_folder
