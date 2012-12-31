@@ -9,7 +9,7 @@ from django.conf import settings
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 import os
-from cframe.serializers import json_response
+from cframe.serializers import json_response, json_serialize
 
 def context(request):
     c = {}
@@ -66,6 +66,18 @@ def page(request, name):
     return render_to_response(template, c, 
                               context_instance=RequestContext(request, 
                                                         processors=[context]))
+
+def data(request, name):
+    ''' Return a data object ready for requirejs to implement for 
+    widget assistance and knowledge/sigs etc...'''
+    c = {}
+    ws = Widget.objects.filter(name=name)
+    if len(ws) >= 1:
+        w = ws[0]
+        c['widget'] = w
+        c['path'] = '/media/unpacked/%s' % w.path   
+    t = 'define(' + json_serialize(c) + ')'
+    return HttpResponse(t)
 
 def manifest(request, name):
 

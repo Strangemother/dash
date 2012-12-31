@@ -8,8 +8,9 @@ Widget = function () {
 
 
     self.init = function(){
-        self._grid = arg(arguments, 0, null);
-        self._options = arg(arguments, 1, {});
+        self._options = arg(arguments, 0, {});
+        self._context = arg(arguments, 1, {});
+        console.log("Widget init", self._options, self._context)
         self.colorModule = Color;
         self._closedIcons = [];
         self._color = null;
@@ -26,10 +27,10 @@ Widget = function () {
             highlightColor: '#EFEFEF',
 
             // Icon used when the widget is in it's closed state
-            closedIcon: '/static/img/icons/dna.svg',
+            closedIcon: 'dna.svg',
 
             // Icon used when the widget is in it's open state
-            openIcon: '/static/img/icons/fire.svg',
+            openIcon: 'fire.svg',
 
             // If the widget is open or closed. Also used for the widgets initial state.
             closed: true,
@@ -65,7 +66,7 @@ Widget = function () {
                 console.log("Open Handler");
             },
             closedHandler: function(){
-                console.log('Open Handler');
+                // console.log('Closed Handler');
             },
             onClick: function(event, options) {
                 this.toggleHighlight()
@@ -107,26 +108,28 @@ Widget = function () {
         }
 
         //debugger;
-        self.renderoptions()
+        self.renderoptions(self._options)
         // fetch and load manifest
         
-        self.loadManifest(self.options.name)
+        self.loadManifest(self.context().name)
         return self;
     }
 
+    self.context = function(){
+        return self._context;
+    }
     self.loadManifest = function(name) {
         // load a manifest file into this class as a dictionary of data.
         var url = '/widget/manifest/' + name + '/';
         jsonResponse(url, 'GET', {}, function(data){
-            data = JSON.parse(data)[0]
             self.manifest = data;
         })
     }
 
-    self.renderoptions = function(){
+    self.renderoptions = function(opts){
         if(!self._renderedOptions) {
             self._renderedOptions = true;
-            self.options = $.extend( self.options, self._options);
+            self.options = $.extend( self.options, opts);
         }
         return self.options
     }
@@ -219,11 +222,11 @@ Widget = function () {
     // or was passed in instantiation.
     self.addToGrid = function() {
         self.showLoader('load');
-        var grid = arg(arguments, 0, self._grid);
+        self._grid = arg(arguments, 0, self._grid);
         
-        if (grid) {
+        if (self._grid) {
             var html = self.html();
-            self.element = grid.add_widget(html)
+            self.element = self._grid.add_widget(html)
             // self.element.opacity(.5)
             self.backgroundColor(self.options.backgroundColor);
             // Click Handler
@@ -582,14 +585,14 @@ Widget = function () {
             var dfd = $('.cacheImageContainer').imagesLoaded();
                 // Always
             dfd.always( function(){
-                console.log( 'all images has finished with loading, do some stuff...' );
+                // console.log( 'all images has finished with loading, do some stuff...' );
             });
 
             // Resolved
             dfd.done( function( $images ){
                 // callback provides one argument:
                 // $images: the jQuery object with all images
-                console.log( 'deferred is resolved with ' + $images.length + ' properly loaded images' );
+                // console.log( 'deferred is resolved with ' + $images.length + ' properly loaded images' );
 
                 func.apply(self, $images);
             });
@@ -600,7 +603,7 @@ Widget = function () {
                 // $images: the jQuery object with all images
                 // $proper: the jQuery object with properly loaded images
                 // $broken: the jQuery object with broken images
-                console.log( 'deferred is rejected with ' + $broken.length + ' out of ' + $images.length + ' images broken' );
+                // console.log( 'deferred is rejected with ' + $broken.length + ' out of ' + $images.length + ' images broken' );
             });
 
             // Notified
@@ -611,19 +614,29 @@ Widget = function () {
                 // $images:  jQuery object with all images in set
                 // $proper:  jQuery object with properly loaded images so far
                 // $broken:  jQuery object with broken images so far
-                console.log( 'Loading progress: ' + ( $proper.length + $broken.length ) + ' out of ' + $images.length );
+                //console.log( 'Loading progress: ' + ( $proper.length + $broken.length ) + ' out of ' + $images.length );
             });
 
         });
             
     }
 
+    // get asset path here
+
     self.openIconUrl = function(){
-        return self.options.openIconUrl = arg(arguments,0, sprintf( '%(icon)s', {icon: self.options.openIcon} ) )
+        return self.options.openIconUrl = arg(arguments,0, 
+            sprintf( '%(iconpath)s/%(icon)s', {
+                                        icon: self.options.closedIcon,
+                                        iconpath: self.context().path + '/icons'
+                                    } ) )
     }
     
     self.closedIconUrl = function(){
-        return self.options.closedIconUrl = arg(arguments,0, sprintf( '%(icon)s', {icon: self.options.closedIcon} ) )
+        return self.options.closedIconUrl = arg(arguments,0, 
+            sprintf( '%(iconpath)s/%(icon)s', {
+                                        icon: self.options.closedIcon,
+                                        iconpath: self.context().path + '/icons'
+                                    } ) )
     }
 
     // Return a jquery element of the img tag
@@ -736,3 +749,8 @@ Widget = function () {
 
     return self.init.apply(self, arguments)
 }
+
+define(function(){
+
+    return Widget;
+})

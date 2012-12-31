@@ -14,33 +14,58 @@ page.appendWidgets = function() {
 }
 
 page.appendWidget = function() {
-    var widgetData = arg(arguments, 0, null);
+    var widgetPathData = arg(arguments, 0, null);
+    var context = arg(arguments, 1, {});
 
-    if(widgetData == null) {
+    if(widgetPathData == null) {
         return false;
     }
-
     // make a call to the model for a pk's path to main.js
     // WidgetData: pk
-    if(widgetData.hasOwnProperty('path')) {
-        // impoer main.js from path point
+    if(widgetPathData.hasOwnProperty('path')) {
+        // import main.js from path point
         // as widget name 
 
         // name of widget
-        var name = widgetData['name'];
-        var path = '/media/unpacked/' + widgetData['path'] + '/main.js'
-        require([path, 'gridding'], function(widgetData){
-            // widget lib importedrequire(['gridding'], function(){
-            gridding.addWidget(widgetData);
-            //gridding.createGrid(gridding.layout());
+        var name = widgetPathData['name'];
+        console.log("page::appendWidget has name")
+
+        /*
+        Call and include the widget from it's path.
+        */
+        var contxt = '/widget/data/' + widgetPathData.name;
+        var widgetPath = '/media/unpacked/' + widgetPathData.path + '/main.js'
+        console.log("Calling context", contxt);
+        console.log("Calling js", widgetPath);
+
+        require([contxt, widgetPath, 'gridding'], function(context, widgetData){
+                // widget lib importedrequire(['gridding'], function()
+                if(widgetData == undefined) {
+                    // Something went wrong with the custome widget
+                    throw new Error("Missing widget data at: '" + widgetPath + "'")
+                }   
+
+                if(context == undefined || context == {}) {
+                    // Something went wrong with the custome widget
+                    throw new Error("Missing context data at: '" + context + "'")
+                }
+
+                // Reigster widget here, allowing a custom context ro be
+                // ready inside the context of the object before loosing scope.
+
+                // RegisterWidget can accept an object or a function.
+               
+                gridding.addWidget(widgetData, context)
+                //gridding.createGrid(gridding.layout());
         });
         
     } else {
         // make call - receive endpoint.
         // add to require masking extension random id to api call
-
-        require(['gridding'], function(){
-            gridding.addWidget(widgetData);
+        var contxt = '/widget/data/' + widgetPathData;
+        var widgetPath = '/media/unpacked/' + widgetPathData + '/main.js';
+        require([contxt, widgetPath, 'gridding'], function(context, widget){
+            gridding.addWidget(widget, context);
             //gridding.createGrid(gridding.layout());
         });
         

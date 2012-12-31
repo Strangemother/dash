@@ -1,40 +1,19 @@
 from io import StringIO
-
-try:
-
-    from django.db.models import Model
-    from django.db.models.query import QuerySet
-    from django.utils.encoding import smart_unicode
-    from django.utils.simplejson import dumps
-    from django.utils import simplejson
-    from datetime import datetime, date
-    from django.http import HttpResponse
-except ImportError:
-    django_lib = False
-else:
-    django_lib = True
-    # no django
-
-class Error(Exception):
-    ''' Base class for exceptions in this module'''
-    pass
-
-class NoDjangoError(Error):
-    '''Exception raised for missing django modules'''
-    def __init__(self, value):
-        self.value = value
+from django.db.models import Model
+from django.db.models.query import QuerySet
+from django.utils.encoding import smart_unicode
+from django.utils.simplejson import dumps
+from django.utils import simplejson
+from datetime import datetime, date
+from django.http import HttpResponse
 
 """
 from serializers import to_json(data, **options)
 """
 
 def model_json(queryset, fields_tuple=None):
-    if django_lib:
-        from django.core import serializers as srl
-        return srl.serialize('json', queryset, fields=fields_tuple)
-    else:
-        raise NoDjangoError('''Cannot use django.core.serializers as Django is
-                            not installed.''')
+    from django.core import serializers as srl
+    return srl.serialize('json', queryset, fields=fields_tuple)
 
 def model_json_response(queryset, fields_tuple=None):
     data = model_json(queryset, fields_tuple)
@@ -44,34 +23,24 @@ def model_json_response(queryset, fields_tuple=None):
         )
 
 def json_response(something):
-    '''return Simple json dumps() wrapped by a django HttpResponse'''
-    o = []
-    o.append(something)
-    return HttpResponse(
-        simplejson.dumps(o),
-        content_type = 'application/javascript; charset=utf8'
-    )
-
+    return json_serialize_response(something)
+    
 def json_serialize(object, *args, **kwargs):
-    ''' Evoke the serializer '''
     js = JSONSerializer()
     j = js.serialize(object, *args, **kwargs)
-
+    
     return j
-
+    
 def json_serialize_response(object, *args, **kwargs):
-    ''' Eveoke the serializer and return a django HttpResponse'''
     r = json_serialize(object, *args, **kwargs)
     return HttpResponse(r, mimetype='application/json')
 
 def to_json(data, **options):
-    ''' Convery the data to JSON
-    return is JSON'''
     js = JSONSerializer()
     j = js.serialize(object, options)
-
+    
     return j
-
+    
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
     def __init__(self, value):
@@ -83,17 +52,17 @@ class UnableToSerializeError(Exception):
 
 '''
 If there are fields requiring serialization,
-pass a list of SerializeEntities to
+pass a list of SerializeEntities to 
 '''
 class SerializeEntity():
-
+    
     def __init__(self, search, replacement):
         self.needle = search
         self.replacement = replacement
-
+    
     def __unicode__(self):
         return u'%s' % self.needle
-
+    
 
 class JSONSerializer():
     boolean_fields = ['BooleanField', 'NullBooleanField']
@@ -150,34 +119,34 @@ class JSONSerializer():
         """ Called to handle everything, looks for the correct handling """
         if isinstance(object, dict):
             self.handle_dictionary(object)
-
+            
         elif isinstance(object, list):
             self.handle_list(object)
-
+            
         elif isinstance(object, Model):
             self.handle_model(object)
-
+            
         elif isinstance(object, QuerySet):
             self.handle_queryset(object)
-
+            
         elif isinstance(object, bool):
             self.handle_simple(object)
-
+            
         elif isinstance(object, int) or isinstance(object, float) or isinstance(object, long):
             self.handle_simple(object)
 
         elif isinstance(object, unicode):
             self.handle_simple(object)
-
+            
         elif isinstance(object, basestring):
             self.handle_simple(object)
-
+            
         elif isinstance(object, datetime):
             self.handle_datetime(object)
-
+            
         elif isinstance(object, date):
             self.handle_date(object)
-
+            
         elif object == None:
             self.handle_none(object)
         else:
@@ -213,9 +182,9 @@ class JSONSerializer():
                 self.stream.write(u', ')
 
         self.end_array()
-
+    
     def handle_datetime(self, d):
-
+        
         self.start_object()
         self.stream.write(u'"date" : "%s", ' % str(d))
         self.stream.write(u'"day" : "%s", ' % d.day )
@@ -226,11 +195,11 @@ class JSONSerializer():
         self.stream.write(u'"second" : "%s", ' % d.second)
         self.stream.write(u'"weekday" : "%s", ' % d.weekday())
         self.stream.write(u'"year" : "%s"' % d.year )
-
+        
         self.end_object()
-
+    
     def handle_date(self, d):
-
+        
         self.start_object()
         self.stream.write(u'"day" : %s, ' % d.day )
         self.stream.write(u'"month" : %s, ' % d.month)
@@ -238,19 +207,19 @@ class JSONSerializer():
         self.stream.write(u'"weekday" : %s, ' % d.weekday())
         self.stream.write(u'"isoformat" : "%s", ' % d.isoformat())
         self.stream.write(u'"ctime" : "%s"' % d.ctime())
-
+        
         self.end_object()
-
-
-
+    
+    
+    
     def handle_model(self, mod):
         """Called to handle a django Model"""
-
+        
         try:
             _meta = mod._meta
         except AttributeError as e:
              _meta = None
-
+        
         if _meta is None:
             # Try a standard object
             self.handle_simple(mod)
@@ -306,7 +275,7 @@ class JSONSerializer():
                 # Related to remote object via primary key
                 pk = related._get_pk_val()
             else:
-
+                
                 if hasattr(mod, '_meta'):
                     so= {}
                     for x in mod.__dict__:
@@ -315,18 +284,18 @@ class JSONSerializer():
                     self.handle_object(so)
                 else:
                     self.handle_simple(mod)
-
+                        
                 self.stream.write(u': ')
                 self.handle_object(d)
                 self.stream.write(u', ')
 
-
+    
 
     def handle_m2m_field(self, mod, field):
         """Called to handle a ManyToManyField.
         BUG:
         Mixes previous calls to this...
-
+        
         Itterates over the same object in the wrong list...
         """
 
@@ -336,18 +305,18 @@ class JSONSerializer():
             self.start_array()
             hasRelationships = False
 
-
+                
             if hasRelationships:
-                self.stream.seek(self.stream.tell()-2)
-
+                self.stream.seek(self.stream.tell()-2)          
+            
             for relobj in getattr(mod, field.name).iterator():
                 hasRelationships = True
                 # This writes the same object to the tree
                 # each time. Replication mod._meta every time.
-
+           
                 self.handle_object(relobj)
                 self.stream.write(u', ')
-
+                
             if hasRelationships:
                 self.stream.seek(self.stream.tell()-2)
             self.end_array()
@@ -356,14 +325,14 @@ class JSONSerializer():
     def handle_simple(self, simple):
         """ Called to handle values that can be handled via simplejson """
         self.stream.write(unicode(dumps(simple)))
-
+    
     def handle_string(self, simple):
         self.stream.write( u'"%s"' % str(simple))
-
+    
     def handle_none(self, object):
         o = u'null'
         self.stream.write(o)#unicode(dumps(o)))
-
+    
     def getvalue(self):
         """Return the fully serialized object (or None if the output stream is  not seekable).sss """
         if callable(getattr(self.stream, 'getvalue', None)):

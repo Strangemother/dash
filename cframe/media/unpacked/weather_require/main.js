@@ -1,6 +1,6 @@
 WIDGET = {
     name: 'Weather',
-    closedIcon: '/static/img/icons/weather.svg',
+    closedIcon: 'weather.svg',
     closedText: 'Weather Widget',
     closedIconColor: '#CCCCCC',
     highlightColor: 'rgba(77, 170, 255, 0.41)',
@@ -10,69 +10,111 @@ WIDGET = {
         // list of woeid for yahoo api
         locations: [21125],
         conditionMap: [
-            { id: 0, detail: "tornado", icon: ASSET_IMG_URL + "hurricane.svg" },
-            { id: 1, detail: "tropical storm", icon: ASSET_IMG_URL + "hurricane-1.svg" },
-            { id: 2, detail: "hurricane", icon: ASSET_IMG_URL + "hurricane (3).svg" },
-            { id: 3, detail: "severe thunderstorms", icon: ASSET_IMG_URL + "rain-and-thumderstorm.svg" },
-            { id: 4, detail: "thunderstorms", icon: ASSET_IMG_URL + "thunderstorm.svg" },
-            { id: 5, detail: "mixed rain and snow", icon: [ASSET_IMG_URL + "rain.svg", 
-                                                         ASSET_IMG_URL + "snow.svg"]},
-            { id: 6, detail: "mixed rain and sleet", icon: [ASSET_IMG_URL + "rain.svg", 
-                                                         ASSET_IMG_URL + "sleet.svg"]},
-            { id: 7, detail: "mixed snow and sleet", icon:  [ASSET_IMG_URL + "snow.svg", 
-                                                         ASSET_IMG_URL + "sleet.svg"]},
-            { id: 8, detail: "freezing drizzle", icon: [ASSET_IMG_URL + "cold-2.svg", 
-                                                         ASSET_IMG_URL + "drizzle.svg"] },
-            { id: 9, detail: "drizzle", icon: ASSET_IMG_URL + "drizzle.svg" },
-            { id: 10, detail: "freezing rain", icon:  [ASSET_IMG_URL + "cold.svg", 
-                                                         ASSET_IMG_URL + "rain.svg"] },
-            { id: 11, detail: "showers", icon: ASSET_IMG_URL + "shower.svg" },
-            { id: 12, detail: "showers", icon: ASSET_IMG_URL + "shower.svg" },
-            { id: 13, detail: "snow flurries", icon: ASSET_IMG_URL + "snow 2.svg" },
-            { id: 14, detail: "light snow showers", icon:  [ASSET_IMG_URL + "light show.svg", 
-                                                         ASSET_IMG_URL + "shower.svg"] },
-            { id: 15, detail: "blowing snow", icon:  [ASSET_IMG_URL + "windy.svg", 
-                                                         ASSET_IMG_URL + "snow.svg"]},
-            { id: 16, detail: "snow", icon: ASSET_IMG_URL + "snow.svg" },
-            { id: 17, detail: "hail", icon: ASSET_IMG_URL + "hail.svg" },
-            { id: 18, detail: "sleet", icon: ASSET_IMG_URL + "hail-2.svg" },
-            { id: 19, detail: "dust", icon: ASSET_IMG_URL + "dusty.svg" },
-            { id: 20, detail: "foggy", icon: ASSET_IMG_URL + "fog.svg" },
-            { id: 21, detail: "haze", icon: ASSET_IMG_URL + "fog 2.svg" },
-            { id: 22, detail: "smoky", icon: ASSET_IMG_URL + "windy.svg" },
-            { id: 23, detail: "blustery", icon: ASSET_IMG_URL + "windy-2.svg" },
-            { id: 24, detail: "windy", icon: ASSET_IMG_URL + "windy.svg" },
-            { id: 25, detail: "cold", icon: ASSET_IMG_URL + "cold.svg" },
-            { id: 26, detail: "cloudy", icon: ASSET_IMG_URL + "day-cloud.svg" },
+            { id: 0, detail: "tornado", icon: "hurricane.svg" },
+            { id: 1, detail: "tropical storm", icon: "hurricane-1.svg" },
+            { id: 2, detail: "hurricane", icon: "hurricane (3).svg" },
+            { id: 3, detail: "severe thunderstorms", icon: "rain-and-thumderstorm.svg" },
+            { id: 4, detail: "thunderstorms", icon: "thunderstorm.svg" },
+            { id: 5, detail: "mixed rain and snow", icon: ["rain.svg", 
+                                                         "snow.svg"]},
+            { id: 6, detail: "mixed rain and sleet", icon: ["rain.svg", 
+                                                         "sleet.svg"]},
+            { id: 7, detail: "mixed snow and sleet", icon:  ["snow.svg", 
+                                                         "sleet.svg"]},
+            { id: 8, detail: "freezing drizzle", icon: ["cold-2.svg", 
+                                                         "drizzle.svg"] },
+            { id: 9, detail: "drizzle", icon: "drizzle.svg" },
+            { id: 10, detail: "freezing rain", icon:  ["cold.svg", 
+                                                         "rain.svg"] },
+            { id: 11, detail: "showers", icon: "shower.svg" },
+            { id: 12, detail: "showers", icon: "shower.svg" },
+            { id: 13, detail: "snow flurries", icon: "snow 2.svg" },
+            { id: 14, detail: "light snow showers", icon:  ["light show.svg", 
+                                                         "shower.svg"] },
+            { id: 15, detail: "blowing snow", icon:  ["windy.svg", 
+                                                         "snow.svg"]},
+            { id: 16, detail: "snow", icon: "snow.svg" },
+            { id: 17, detail: "hail", icon: "hail.svg" },
+            { id: 18, detail: "sleet", icon: "hail-2.svg" },
+            { id: 19, detail: "dust", icon: "dusty.svg" },
+            { id: 20, detail: "foggy", icon: "fog.svg" },
+            { id: 21, detail: "haze", icon: "fog 2.svg" },
+            { id: 22, detail: "smoky", icon: "windy.svg" },
+            { id: 23, detail: "blustery", icon: "windy-2.svg" },
+            { id: 24, detail: "windy", icon: "windy.svg" },
+            { id: 25, detail: "cold", icon: "cold.svg" },
+            { id: 26, detail: "cloudy", icon: "day-cloud.svg" },
 
-            { id: 27, detail: "mostly cloudy (night)", icon: ASSET_IMG_URL + "day-cloud.svg" },
-            { id: 28, detail: "mostly cloudy (day)", icon: ASSET_IMG_URL + "day-cloud-2.svg" },
-            { id: 29, detail: "partly cloudy (night)", icon: ASSET_IMG_URL + "day-cloud.svg" },
-            { id: 30, detail: "partly cloudy (day)", icon: ASSET_IMG_URL + "day-cloud.svg" },
-            { id: 31, detail: "clear (night)", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 32, detail: "sunny", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 33, detail: "fair (night)", icon: ASSET_IMG_URL + "day-cloud.svg" },
-            { id: 34, detail: "fair (day)", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 35, detail: "mixed rain and hail", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 36, detail: "hot", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 37, detail: "isolated thunderstorms", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 38, detail: "scattered thunderstorms", icon: ASSET_IMG_URL + "rain-and-thunder-storm.svg" },
-            { id: 39, detail: "scattered thunderstorms", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 40, detail: "scattered showers", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 41, detail: "heavy snow", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 42, detail: "scattered snow showers", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 43, detail: "heavy snow", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 44, detail: "partly cloudy", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 45, detail: "thundershowers", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 46, detail: "snow showers", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 47, detail: "isolated thundershowers", icon: ASSET_IMG_URL + "++.svg" },
-            { id: 3200, detail: "not available", icon: ASSET_IMG_URL + "++.svg" }
+            { id: 27, detail: "mostly cloudy (night)", icon: "day-cloud.svg" },
+            { id: 28, detail: "mostly cloudy (day)", icon: "day-cloud-2.svg" },
+            { id: 29, detail: "partly cloudy (night)", icon: "day-cloud.svg" },
+            { id: 30, detail: "partly cloudy (day)", icon: "day-cloud.svg" },
+            { id: 31, detail: "clear (night)", icon: "error.svg" },
+            { id: 32, detail: "sunny", icon: "error.svg" },
+            { id: 33, detail: "fair (night)", icon: "day-cloud.svg" },
+            { id: 34, detail: "fair (day)", icon: "error.svg" },
+            { id: 35, detail: "mixed rain and hail", icon: "error.svg" },
+            { id: 36, detail: "hot", icon: "error.svg" },
+            { id: 37, detail: "isolated thunderstorms", icon: "error.svg" },
+            { id: 38, detail: "scattered thunderstorms", icon: "rain-and-thunder-storm.svg" },
+            { id: 39, detail: "scattered thunderstorms", icon: "error.svg" },
+            { id: 40, detail: "scattered showers", icon: "error.svg" },
+            { id: 41, detail: "heavy snow", icon: "error.svg" },
+            { id: 42, detail: "scattered snow showers", icon: "error.svg" },
+            { id: 43, detail: "heavy snow", icon: "error.svg" },
+            { id: 44, detail: "partly cloudy", icon: "error.svg" },
+            { id: 45, detail: "thundershowers", icon: "error.svg" },
+            { id: 46, detail: "snow showers", icon: "error.svg" },
+            { id: 47, detail: "isolated thundershowers", icon: "error.svg" },
+            { id: 3200, detail: "not available", icon: "error.svg" }
         ]
     }, 
+    weatherGeocode: function(location, cb) {
+        var status;
+        var results;
+        var html = '';
+        var msg = '';
+        var output = '';
+
+        if (location) {
+            // Cache results for an hour to prevent overuse
+            now = new Date();
+
+            // Create Yahoo Weather feed API address
+            var query = 'select * from geo.places where text="'+ location +'"';
+            var api = 'http://query.yahooapis.com/v1/public/yql?q='+ encodeURIComponent(query) +'&rnd='+ now.getFullYear() + now.getMonth() + now.getDay() + now.getHours() +'&format=json&callback=?';
+
+            // Send request
+            $.ajax({
+                type: 'GET',
+                url: api,
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data.query);
+                    cb(data.query)
+                },
+                error: function(data) {
+                    output = { error: 'An error has occurred'};
+                }
+            });
+
+        } else {
+            output = { error: 'Please enter a location or partial address'};
+        }
+
+        return output;
+    },
     visibleHandler: function(){
         if(!this.store.has('weather')) {
             this.options.getWeather.apply(this)
         }
+    },
+    getLocation: function(){
+        /*
+        Present a large popup asking for the user location, 
+        store a woeid
+        */
+        
     },
     getWeather: function() {
         var self = this;
@@ -153,13 +195,15 @@ WIDGET = {
             "units": feed.units
         }
         
-        this.store.set('weather', weather)
-        
+        this.store.set('weather', weather);
 
+        return this.options.renderWeather.call(this, weather)
+    },
+    renderWeather: function(weather) {
 
         this.text().text(weather.condition.text)
         var unit = ' &#8457;';
-        if(feed.units.temperature == 'C') {
+        if(weather.units.temperature == 'C') {
             unit =  '&deg;';
         }
 
@@ -178,9 +222,11 @@ WIDGET = {
         };
 
         if(pageVisible) {
-            this.options.renderPage.apply(this, this.currentPage)
+            return this.options.renderPage.apply(this, $(this.currentPage) )
         }
         this.hideLoader.call(this, 'getWeather');
+
+        return true
     },
     renderPage: function(element) {
         // pass a jquery iframe element (a page)
@@ -198,7 +244,14 @@ WIDGET = {
             unit =  '&deg;';
         }
 
-        element.find('.today .icon img')[0].src = this.options.config.conditionMap[w.condition.code].icon;
+        var self = this;
+        function icon(code) {
+            var path = this.context().path;
+            var _icon = this.options.config.conditionMap[code].icon;
+            return path + '/icons/' + _icon;
+        }
+
+        element.find('.today .icon img')[0].src = icon.call(this, w.condition.code);
         element.find('.today .text').text(w.condition.text)
         element.find('.today .temp').html(w.condition.temp + '' + unit)
 
@@ -213,8 +266,8 @@ WIDGET = {
         element.find('.forecast .first .text').text(w.todayForcast.text)
         element.find('.forecast .second .text').text(w.tomorrowForcast.text)
 
-        element.find('.forecast .first .icon img')[0].src = this.options.config.conditionMap[w.todayForcast.code].icon
-        element.find('.forecast .second .icon img')[0].src = this.options.config.conditionMap[w.tomorrowForcast.code].icon
+        element.find('.forecast .first .icon img')[0].src = icon.call(this, w.todayForcast.code)
+        element.find('.forecast .second .icon img')[0].src = icon.call(this, w.tomorrowForcast.code)
 
         element.find('.date').text(w.wpd)
     },
@@ -231,8 +284,10 @@ WIDGET = {
         console.log('loaded weather')
         if(!this.store.has('weather')) {
             this.options.getWeather.apply(this)
+        } else {
+            this.options.renderWeather.call(this, this.store.get('weather'))
         }
     }
 }
 
-registerWidget(WIDGET)
+define(WIDGET)

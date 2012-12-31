@@ -2,9 +2,9 @@
 WIDGET = {
     /* By default this is true unless set false */
     name: 'Hello World',
-    closedIcon: '/static/img/icons/hello.svg',
+    closedIcon: 'hello.svg',
     closedText: 'Hello',
-    openIcon: '/static/img/icons/world.svg',
+    openIcon: 'world.svg',
     openText: 'World.',
     highlightColor: '#2E454D',
 
@@ -29,4 +29,4 @@ WIDGET = {
     }
 }
 
-registerWidget(WIDGET)
+define(WIDGET)

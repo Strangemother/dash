@@ -12,20 +12,35 @@ gridding.createGrid = function(serializeParams){
 
 
 gridding.addWidget = function(){
+    /*
+    Receive wudget data to be applied to a Widget class
+    and placed on the current grid.
+    */
     var widget = arg(arguments, 0, null);
-   
+    var context = arg(arguments, 1, {})
+
+    console.log("gridding::addWidget", widget, context)
+
     var gridster = $(".gridster ul").gridster().data('gridster');  
+    
     if(typeof(widget) == 'string') {
-       
-        require(['widget/'+ widget +'/main'],
-            function (widget) {
-                var scope = function(){}
-                wid = Widget.call(scope, gridster, widget);
-                wid.addToGrid();
+        var widgetName = widget;
+        require(['app/Widget', 'widget/'+ widgetName +'/main'],
+            function () {
+                console.log("Context into the widget", context)
+                require(['app/Widget'], function(){
+                    wid = Widget(widget, context);
+                    wid.addToGrid(gridster); 
+
+                })
          });
+
     } else {
-        wid = Widget(gridster, widget);
-        wid.addToGrid();
+        console.log("Context going into the widget", context)
+        require(['app/Widget'], function(){
+            wid = Widget(widget, context);
+            wid.addToGrid(gridster);
+        })
     }
     //var _gravel = $('.gravel-templates .add-widget').gravel()[0]
     //_gravel.addButton('Step One', function(){
