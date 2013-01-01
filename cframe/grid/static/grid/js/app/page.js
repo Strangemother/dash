@@ -28,15 +28,11 @@ page.appendWidget = function() {
 
         // name of widget
         var name = widgetPathData['name'];
-        console.log("page::appendWidget has name")
-
         /*
         Call and include the widget from it's path.
         */
         var contxt = '/widget/data/' + widgetPathData.name;
         var widgetPath = '/media/unpacked/' + widgetPathData.path + '/main.js'
-        console.log("Calling context", contxt);
-        console.log("Calling js", widgetPath);
 
         require([contxt, widgetPath, 'gridding'], function(context, widgetData){
                 // widget lib importedrequire(['gridding'], function()

@@ -2,14 +2,27 @@ gridding = {}
 Sadie.gridding=gridding;
 
 gridding.createGrid = function(serializeParams){
+    var unDragHooks = [];
     $(".gridster ul").gridster({
         widget_margins: [10, 10],
         widget_base_dimensions: [200, 200],
+        draggable: {
+            start: function(e, ui) { 
+                $(ui.helper).data().reference().dragging(true)
+            },
+            stop: function(e, ui) { 
+                for (var i = 0; i < unDragHooks.length; i++) {
+                    unDragHooks[i].dragging(false);
+                };
+                //$(ui.helper).data().reference(ui).dragging(false)
+            }
+        },
         serialize_params: serializeParams
     });
     gridding.grid = $(".gridster ul").gridster().data('gridster');
 }
 
+gridding.widgets = [];
 
 gridding.addWidget = function(){
     /*
@@ -19,29 +32,30 @@ gridding.addWidget = function(){
     var widget = arg(arguments, 0, null);
     var context = arg(arguments, 1, {})
 
-    console.log("gridding::addWidget", widget, context)
-
     var gridster = $(".gridster ul").gridster().data('gridster');  
     
     if(typeof(widget) == 'string') {
         var widgetName = widget;
         require(['app/Widget', 'widget/'+ widgetName +'/main'],
             function () {
-                console.log("Context into the widget", context)
                 require(['app/Widget'], function(){
                     wid = Widget(widget, context);
                     wid.addToGrid(gridster); 
-
+                    gridding.widgets.push(wid)
                 })
          });
 
     } else {
-        console.log("Context going into the widget", context)
         require(['app/Widget'], function(){
             wid = Widget(widget, context);
-            wid.addToGrid(gridster);
+            wid.addToGrid(gridster); 
+            gridding.widgets.push(wid)
         })
+
+
     }
+
+
     //var _gravel = $('.gravel-templates .add-widget').gravel()[0]
     //_gravel.addButton('Step One', function(){
 //      this.close();

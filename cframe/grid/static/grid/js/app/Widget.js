@@ -10,7 +10,6 @@ Widget = function () {
     self.init = function(){
         self._options = arg(arguments, 0, {});
         self._context = arg(arguments, 1, {});
-        console.log("Widget init", self._options, self._context)
         self.colorModule = Color;
         self._closedIcons = [];
         self._color = null;
@@ -69,7 +68,9 @@ Widget = function () {
                 // console.log('Closed Handler');
             },
             onClick: function(event, options) {
-                this.toggleHighlight()
+                if(!self.dragging()) {
+                    this.toggleHighlight()
+                }
             },
             onDoubleClick: function(event, options) {
                 this.toggleState();
@@ -81,6 +82,8 @@ Widget = function () {
                 console.log("visible");
 
             },
+            column: 1,
+            row: 1,
             closedWidth: 1,
             closedHeight: 1,
             openWidth: 4,
@@ -115,6 +118,28 @@ Widget = function () {
         return self;
     }
 
+    self.centerPoint = function(){
+        var el = arg(arguments, 0, null)
+        /* returns an object {top, left}
+        denoting the center point of the widget in px 
+        pass an element and the top and left will be 
+        correctly ajusted for the elements scope. Allowing
+        direct pass to the child object.
+        */
+        var _width = (self.element.width() * .5);
+        var _height = (self.element.height() * .5);
+
+        if(el) {
+            _width -= el.width() * .5;
+            _height -= el.height() * .5;
+        }
+
+        return {  
+            left: _width,
+            top: _height
+        }
+    }
+
     self.context = function(){
         return self._context;
     }
@@ -143,11 +168,45 @@ Widget = function () {
     }
 
     self.text = function(){
-        var defEl = self.element.find('.' + self.options.textElementClass)
-        self._text = arg(arguments, 0, self._text || defEl);
 
+        // Try the passed text, then the title, then closed or open text based upon
+        // current state.
+
+        /*
+        Collects current state text. 
+           self._closedText or options.closedText
+        or self._openText or options.openText.
+
+        save stored value into _closedText or _openText
+        */
+        var currentStateText = (self.closed)? (self._closedText || self.options.closedText): (self._openText || self.options.openText);
+        self[(self.closed)? '_closedText': '_openText'] = self._text = arg(arguments, 0, self._text || self.options.title || currentStateText);
+        self.textElement().text(self._text);
+        if(arguments[0]) {
+            return self;
+        }
         return self._text;
+    }
 
+    self.textElement = function(){
+        var defEl = self.element.find('.' + self.options.textElementClass);
+        self._textElement = arg(arguments, 0, self._textElement || defEl);
+        if(self._textElement) {
+            self._textElement.css('font-size', self.fontSize())
+        }
+        return self._textElement;
+    }
+
+    self.fontSize = function(){
+        self._fontSize = arg(arguments, 0, self._fontSize || self.options.fontSize || 12)
+        if(self._textElement) {
+            self._textElement.css('font-size', self._fontSize);
+        }
+        if(arguments[0] != undefined) {
+            return self
+        }
+
+        return self._fontSize;
     }
 
     self.content_1 = function(){
@@ -217,6 +276,46 @@ Widget = function () {
         }
     }
 
+    self.dragging = function(){
+        return self._dragging = arg(arguments, 0, self._dragging || false);
+    }
+
+    self.store = {
+        'set': function(key, value){
+            Sadie.model.addToSpace(self.options.name, key, value);
+            return value;
+        },
+
+        'has': function(key) {
+            var k= '';
+            for (var i in Sadie.model.spaceData) {
+                k = self.options.name + '-' + key;
+                if(i ==k) {
+                    return true;
+                }
+            };
+
+            return false;
+        },
+
+        'getCreate': function(key, value) {
+            var val = Sadie.model.getFromSpace(self.options.name, key);
+            if(val == undefined) {
+                Sadie.model.addToSpace(self.options.name, key, value);
+                return value;
+            };
+            return val;
+        },
+
+        'get': function(key){
+            var returnVal = arg(arguments, 1, null);
+            var val = Sadie.model.getFromSpace(self.options.name, key);
+            if(val == undefined) {
+                return returnVal;
+            };
+            return val;
+        }
+    }
 
     // Add this to the grid that is passed 
     // or was passed in instantiation.
@@ -224,11 +323,40 @@ Widget = function () {
         self.showLoader('load');
         self._grid = arg(arguments, 0, self._grid);
         
+        /*
+        If the grid exists generate the HTML and hook the 
+        visible element
+        */
         if (self._grid) {
             var html = self.html();
-            self.element = self._grid.add_widget(html)
+
+            // Add the widget to the grid interface, returning the
+            // dom object
+            self.element = self._grid.add_widget(html, self.options.closedWidth, 
+                                                    self.options.closedHeight,
+                                                    self.options.column,
+                                                    self.options.row
+                                                    )
+            // Store the name of the widget into the jQuery data space
+            $(self.element).data('name', this.name);
+
+            // Store a callback method in the jQuery data space to easily
+            // collect this widget.
+            // Using this method means you not storing hard references to the
+            // widget
+            $(self.element).data('reference', function(){
+                for (var i = 0; i < Sadie.gridding.widgets.length; i++) {
+                    // collect from the global widget storage
+                    var w = Sadie.gridding.widgets[i];
+                    if (w.name == self.name) {
+                        return w;
+                    }
+                };
+            })
+
             // self.element.opacity(.5)
             self.backgroundColor(self.options.backgroundColor);
+            
             // Click Handler
             self.element.click(function(e){
                 self.options.onClick.call(self, e, self.options);
@@ -239,86 +367,60 @@ Widget = function () {
             });
 
             self.pageLoadHandler = self.options.pageLoadHandler;
-
-            self.store = {
-                'set': function(key, value){
-                    Sadie.model.addToSpace(self.options.name, key, value);
-                    return value;
-                },
-
-                'has': function(key) {
-                    var k= '';
-                    for (var i in Sadie.model.spaceData) {
-                        k = self.options.name + '-' + key;
-                        if(i ==k) {
-                            return true;
-                        }
-                    };
-
-                    return false;
-                },
-
-                'getCreate': function(key, value) {
-                    var val = Sadie.model.getFromSpace(self.options.name, key);
-                    if(val == undefined) {
-                        Sadie.model.addToSpace(self.options.name, key, value);
-                        return value;
-                    };
-                    return val;
-                },
-
-                'get': function(key){
-                    var returnVal = arg(arguments, 1, null);
-                    var val = Sadie.model.getFromSpace(self.options.name, key);
-                    if(val == undefined) {
-                        return returnVal;
-                    };
-                    return val;
-                }
-            }
-
-
         }
 
+        var closed = true;
 
-        var $img = self.element.find('img.svg')
-        var imgID = $img.attr('id');
-        var imgClass = $img.attr('class');
-        var imgURL = $img.attr('src');
+        if(closed) {
+            self.showClosedState()
 
-        self.showClosedState()
+            if(self.options.closedIcon != null) {
 
-        jQuery.get(imgURL, function(data) {
-            // Get the SVG tag, ignore the rest
-            var $svg = jQuery(data).find('svg');
+                var $img = self.element.find('img.svg')
+                var imgID = $img.attr('id');
+                var imgClass = $img.attr('class');
+                var imgURL = $img.attr('src');
 
-            // Add replaced image's ID to the new SVG
-            if(typeof imgID !== 'undefined') {
-                $svg = $svg.attr('id', imgID);
+                jQuery.get(imgURL, function(data) {
+                    // Get the SVG tag, ignore the rest
+                    var $svg = jQuery(data).find('svg');
+
+                    // Add replaced image's ID to the new SVG
+                    if(typeof imgID !== 'undefined') {
+                        $svg = $svg.attr('id', imgID);
+                    }
+                    // Add replaced image's classes to the new SVG
+                    if(typeof imgClass !== 'undefined') {
+                        $svg = $svg.attr('class', imgClass+' replaced-svg');
+                    }
+
+                    // Remove any invalid XML tags as per http://validator.w3.org
+                    $svg = $svg.removeAttr('xmlns:a');
+
+                    // Replace image with new SVG
+                    $img.replaceWith($svg);
+
+                    self.iconColor();
+                    
+                    // Hook the events to self.
+
+                    //page.addEventReceiver.call(self, self.options.touchHandler);
+                    self.show.call(self);
+                });
+
+            } else {
+                self.show.call(self);
             }
-            // Add replaced image's classes to the new SVG
-            if(typeof imgClass !== 'undefined') {
-                $svg = $svg.attr('class', imgClass+' replaced-svg');
-            }
+        } else {
+            self.showOpenState()
+        }
+    }
 
-            // Remove any invalid XML tags as per http://validator.w3.org
-            $svg = $svg.removeAttr('xmlns:a');
-
-            // Replace image with new SVG
-            $img.replaceWith($svg);
-
-            self.iconColor();
-            
-            // Hook the events to self.
-
-            //page.addEventReceiver.call(self, self.options.touchHandler);
-
-            self.element.fadeIn('slow', function(){
-                self.hideLoader('load')
-                self.options.visibleHandler.apply(self);
-            })
-        });
-
+    self.show = function(){
+        self.element.fadeIn('slow', function(){
+            self.hideLoader('load');
+            self.options.visibleHandler.apply(self);
+        })
     }
 
     self.showOpenState = function(){
@@ -326,20 +428,24 @@ Widget = function () {
         self.height(self.options.openHeight);
         self.width(self.options.openWidth);
         // self.text() returns jquery element
-        self.text().css('font-size', '24px');
+        self.textElement().css('font-size', '24px');
         // hence the ugly syntax
-        self.text().text(self._openText || self.text().text() || self.options.openText);
         self.closed = false;
         self.open = true;
-    
-        self.icon(self.options.openIcon);
+        
+        self.text(self._openText || self.options.openText || self.text());
+
+        if(self.options.openIcon != null) {
+            self.icon(self.options.openIcon);
+        }
+
         self.showPage(self.options.name);
         self.options.openHandler.apply(self)
         
         return self;
     }
 
-    self.showClosedState = function(){
+    self.showClosedState = function() {
        
         if(self._pagevisble == true) {
             $(self.element).find('iframe').hide();
@@ -348,12 +454,14 @@ Widget = function () {
         self.width(self.options.closedWidth);
         self.height(self.options.closedHeight);
         //self.icon()[0].src = self.closedIconUrl();
-        self.text().css('font-size', '12px');
-        self.text().text(self._closedText || self.text().text() || self.options.closedText);
+        // self.text().css('font-size', '12px');
         self.closed = true;
-        self.icon(self.options.closedIcon)
         self.open = false;
-        self.options.closedHandler();
+        self.text(self._closedText || self.options.closedText || self.text());
+        if(self.options.closedIcon != null) {
+            self.icon(self.options.closedIcon);
+        }
+        self.options.closedHandler.apply(self);
         return self;
     }
 
@@ -624,15 +732,15 @@ Widget = function () {
     // get asset path here
 
     self.openIconUrl = function(){
-        return self.options.openIconUrl = arg(arguments,0, 
+        return self.options.openIconUrl = arg(arguments, 0, 
             sprintf( '%(iconpath)s/%(icon)s', {
-                                        icon: self.options.closedIcon,
+                                        icon: self.options.openIcon,
                                         iconpath: self.context().path + '/icons'
                                     } ) )
     }
     
     self.closedIconUrl = function(){
-        return self.options.closedIconUrl = arg(arguments,0, 
+        return self.options.closedIconUrl = arg(arguments, 0, 
             sprintf( '%(iconpath)s/%(icon)s', {
                                         icon: self.options.closedIcon,
                                         iconpath: self.context().path + '/icons'
@@ -643,15 +751,22 @@ Widget = function () {
     self.icon = function(){
         var el = self.element.find('.svg');
         var _iconName = arg(arguments, 0, null);
-
+        var iconEl = self.element.find('.icon');
         if(_iconName != null) {
-        
-            self.element.find('.icon').empty();
-            var img =self[(self.closed)? 'closedIcon': 'openIcon'](_iconName)
-            self.element.find('.icon').append(img)
-        }
+            iconEl.empty();
+            var img =self[(self.closed)? 'closedIcon': 'openIcon'](_iconName);
+            iconEl.show();
+            iconEl.append(img);
+            iconEl.parent().removeClass('no-icon');
+        } else {
+            self.element.find('.icon').hide();
+            iconEl.parent().addClass('no-icon');
+            var textEl = self.element.find('.text');
+            var point = self.centerPoint(textEl);
+            textEl.position(point);
 
-        return el
+        }
+        return el;
     }
 
     self.height = function(){

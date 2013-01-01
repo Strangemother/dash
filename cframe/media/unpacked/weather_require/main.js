@@ -201,7 +201,8 @@ WIDGET = {
     },
     renderWeather: function(weather) {
 
-        this.text().text(weather.condition.text)
+        this.options.closedText = this.text(weather.condition.text).text();
+
         var unit = ' &#8457;';
         if(weather.units.temperature == 'C') {
             unit =  '&deg;';
@@ -281,7 +282,6 @@ WIDGET = {
         pageVisible = false;
     },
     openHandler: function(){
-        console.log('loaded weather')
         if(!this.store.has('weather')) {
             this.options.getWeather.apply(this)
         } else {

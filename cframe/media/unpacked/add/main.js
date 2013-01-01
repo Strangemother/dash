@@ -6,6 +6,7 @@ define({
     openIcon: 'star.svg',
     openText: 'New Widget.',
     highlightColor: '#3CA24C',
+    fontSize: 22,
     openHandler: function(){
     },
     pageLoadHandler: function(element){

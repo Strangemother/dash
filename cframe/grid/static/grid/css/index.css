@@ -58,7 +58,7 @@ body {
 	text-align: center;
 	width: 80%;
 	margin: 10%;
-	margin-top: 0;
+	margin-top: 20px;
 	margin-bottom: 10px;
 	text-shadow: 0 1px 1px #999;
 }
@@ -146,4 +146,12 @@ body {
 	text-decoration: none;
 	border: solid 1px #999;
 	box-shadow: 0 1px 1px #999;
+}
+
+.no-icon .text {
+	margin: 0 auto;
+	text-align: center;
+	top: 50%;
+	position: relative;
+	margin-top: -1em;
 }
