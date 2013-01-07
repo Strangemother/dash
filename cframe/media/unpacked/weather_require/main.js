@@ -1,5 +1,5 @@
 WIDGET = {
-    name: 'Weather',
+    name: 'weather_require',
     closedIcon: 'weather.svg',
     closedText: 'Weather Widget',
     closedIconColor: '#CCCCCC',

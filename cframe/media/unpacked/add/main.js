@@ -1,4 +1,4 @@
-define({
+registerWidget({
     name: 'add',
     // backgroundColor: '#0BF15E',
     closedIcon: 'star.svg',
@@ -12,18 +12,26 @@ define({
     pageLoadHandler: function(element){
         //page.fullalert('Add or upload a widget to use on the dash',
             //'A second line.' , 'creation.svg')
-        $(element).find('.widget-interface-button').die('click').bind('click', {
+        var button = $(element).find('.widget-interface-button')
+        button.die('click').bind('click', {
             parent: this
-        }, 
-            function(event){
+        }, function(event){
                 // add widget
                 event.data.parent.showClosedState()
 
-                Sadie.page.appendWidget({pk: $(this).data('id'),
-                                    path: $(this).data('path'),
-                                    name: $(this).data('name')})
-            
-            })
+                Sadie.page.appendWidget({
+                    pk: $(this).data('id'),
+                    path: $(this).data('path'), 
+                    name: $(this).data('name')
+                })
+        })
+        /*
+        button.parent().click(function(e){
+            e.preventDefault()
+            e.stopPropagation()
+            button.click()
+        })
+*/
     },
     touchHandler: function(ev){
         if(ev.type != 'release') {
@@ -35,9 +43,9 @@ define({
         }
     },
     onClick: function(event, options) {
-        this.toggleHighlight();
+        this.toggleState();
     },
     onDoubleClick: function(event, options) {
-        this.toggleState();
+        //this.toggleHighlight();
     }
 }) 

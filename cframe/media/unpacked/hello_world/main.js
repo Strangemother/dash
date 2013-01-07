@@ -1,5 +1,5 @@
 
-WIDGET = {
+registerWidget({
     /* By default this is true unless set false */
     name: 'Hello World',
     closedIcon: 'hello.svg',
@@ -22,11 +22,9 @@ WIDGET = {
         }
     },
     onClick: function(event, options) {
-        this.toggleHighlight()
+        this.toggleState();
     },
     onDoubleClick: function(event, options) {
-        this.toggleState();
+        //this.toggleHighlight()
     }
-}
-
-define(WIDGET)
+})

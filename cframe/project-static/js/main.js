@@ -98,7 +98,7 @@ function arg(_a, ia, def, returnArray) {
 		 * arguments or object - pass it
 		 */
 		for(var i=0; i<ia.length; i++) {
-			if(_a[ia[i]]){
+			if(_a[ia[i]] || _a[ia[i]] === false ){
 
 				 v = _a[ia[i]];
 				break;
@@ -107,7 +107,7 @@ function arg(_a, ia, def, returnArray) {
 	}
 	else {
 		// if ia is just a value
-		if(_a[ia]) v = _a[ia];
+		if(_a[ia] || _a[ia] === false ) v = _a[ia];
 	}
 
 	if( (v == null) && (def != undefined) ) {
@@ -160,8 +160,8 @@ Color = (function() {
 
 
 			var yiq = ((r*299)+(g*587)+(b*114))/1000;
-
-			return (yiq >= 128) ? 'dark' : 'light';
+            console.log(yiq)
+			return (yiq >= 2183080) ? 'dark' : 'light';
 		}
 
 		this.lightContrast = function(){
