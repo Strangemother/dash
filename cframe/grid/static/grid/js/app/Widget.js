@@ -13,10 +13,18 @@ Widget = function () {
         self.colorModule = Color;
         self._closedIcons = [];
         self._color = null;
+        // The HTML gridding li element
         self.element = null;
+        // Manifest file populated via ajax as an object
         self.manifest = {};
+        // The parent widget that performed the lock
+        self.lockParent = null;
+        // If this widget has been locked by another widget
+        self.locked = false;
         // Hold the iframe page
         self.currentPage = null;
+        // If this element has been highlighted through toggleHighlight()
+        self.highlighted = false;
         self.options = {
 
             // Color of the background.
@@ -52,7 +60,20 @@ Widget = function () {
             //Color of the text when the widgets backgroound is in high contrast mode.
             darkTextColor: '#333',
 
-            // require.js dependency injection.
+            /*
+            List of widget names required for this widget to function
+            Such as 'socket', 'pinpad' or 'ip' - it's a rudimentary form
+            of application resource sharing. If this widget is missing,
+            The gridding options will determine if widget installs should 
+            happen.
+
+            It's probably best to add a failureHandler for this.
+            */
+            required: [],
+
+            /*
+            requirejs module dependecies 
+            */
             dependencies: [],
 
             /* if multiple icons are set for open or closed, define the
@@ -60,19 +81,50 @@ Widget = function () {
             Set to <= 0 to stop autocycling.
             */
             iconCycleDelay: 3500,
+            initHandler: function(){
+                /* widget initialised. This is the very first
+                method to be called after the widget has handled the data 
+                received. 
 
+                Method overrides and setup should be done here.
+                */
+            },
+            returnHandler: function() {
+                /*
+                handler called when a widget requests data from another widget.
+                */
+            },
+            toValue: function(){ 
+                /*
+                Returns contextual information for another js based call.
+                RPC, widget, console may access this information. 
+
+                This should be coded to return a value or perform logic 
+                and return a value
+
+                >>> Sadie.getWidget('example_ip').toValue()
+                */
+            },
             openHandler: function(){
+                /*
+                Called when the widget opens to display it's main content
+                widget.showOpenHandler()
+                */
                 console.log("Open Handler");
             },
             closedHandler: function(){
                 // console.log('Closed Handler');
             },
             onClick: function(event, options) {
+                /* Handles click event */
+                /*
                 if(!self.dragging()) {
                     this.toggleHighlight()
                 }
+                */
             },
             onDoubleClick: function(event, options) {
+                /* Handle double click event */
                 this.toggleState();
             },
             pageLoadHandler: function(element){
@@ -80,6 +132,9 @@ Widget = function () {
             },
             visibleHandler: function(){
                 console.log("visible");
+
+            },
+            lockHandler: function() {
 
             },
             column: 1,
@@ -90,11 +145,13 @@ Widget = function () {
             openHeight: 3,
             textElementClass: 'text',
             content_1: 'content_1',
+            content_2: 'content_2',
             format: '<li class="new"> \
             <div class="spinner"></div> \
             <div class="icon">%(icon)s</div> \
             <div class="text">%(text)s</div> \
             <div class="content_1">%(content_1)s</div> \
+            <div class="content_2">%(content_2)s</div> \
             </li>', 
 
             // When this widget is open
@@ -105,7 +162,10 @@ Widget = function () {
         }
 
         self.closed = self.options.closed;
-        self.visible = self.options.visible;    
+        self.visible = self.options.visible;
+        // overwrtable return handler for returning js data to contextual
+        // requirements
+
         self.options.onClick.prototype.close = function(){
             //back to close state.
         }
@@ -115,7 +175,43 @@ Widget = function () {
         // fetch and load manifest
         
         self.loadManifest(self.context().name)
+
+        var initHandler = self.options.initHandler || function(){}
+        self.name = self.options.name;
+        initHandler.call(this)
         return self;
+    }
+
+    self.toValue = function(){
+        return self.options.toValue.apply(this, arguments);
+    }
+    self.getValue = function() {
+        /*
+        Perform widgets method of perform, returning 
+        contextual information for use with the called object.
+        Note - This information may be passed through the a
+        socket layer, thus getValue return data should reflect this
+
+        Methods of callback.
+        getValue({ options }, callback(data))
+        getValue(callback(data))
+        getValue() // return the toValue() method
+        */
+        var arg1 = arg(arguments, 0, {});
+        // return the 2nd arg, else return the first, otherwise return null
+        var callback =  arg(arguments, 1, arg(arguments, 0, null))
+        var val = null;
+
+        if(typeof(arg1) == 'function') {
+            callback = arg1;
+            arg1 = {}
+        }
+        val = self.toValue(arg1, function(pin){
+            return callback.call(this, pin);
+
+        });
+        
+        return val;
     }
 
     self.centerPoint = function(){
@@ -143,6 +239,78 @@ Widget = function () {
     self.context = function(){
         return self._context;
     }
+
+    self.lock = function(parent){
+        /*
+        Lock this widget to be owned by another.
+        This is useful for spawning children widgets to receive or
+        send data.
+
+        returns true and applies the lock if available
+        returns false if cannot be locked.
+        */
+
+        if(this.locked == false || this.locked == undefined) {
+            if(this.lockParent == null) {
+                this.lockParent = parent;
+                // Provide the outline width color as the width of the lock parent.
+                // Using outline ensures width isn't affected.
+                var color = parent.options.highlightColor || parent.backgroundColor();
+                
+                this.element.css('outline', 'solid 2px ' + color);
+                
+                // Light up parent widget
+                
+                if(parent.closed) {
+                    parent.highlight(true)
+                }
+                return this.locked = true;
+            } else {
+                if(parent == this.lockParent) {
+                    return this.locked = true;
+                } else {
+                    return false;
+                }
+            }
+
+        } else if(parent == this.lockParent) {
+            // The lock has been applied by the given parent.
+            // therefore, it's okay to return true
+            return this.locked = true
+        }
+
+        return false;
+    }
+
+    self.unlock = function(parent){ 
+        /*
+        remove the lock on this widget. 
+        For auth, the original parent must be passed.
+        
+        returns true if unlocked
+        returns true if no lock
+        returns false if not unlocked
+        */
+
+        this.element.css('outline', '');
+
+        if(parent.highlighted) {
+            parent.toggleHighlight(false)
+        }
+        if(this.locked == false) {
+            this.lockParent = null;
+            return true;
+        } else {
+            if(parent == this.lockParent) {
+                this.locked = false;
+                this.lockParent = null;
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     self.loadManifest = function(name) {
         // load a manifest file into this class as a dictionary of data.
         var url = '/widget/manifest/' + name + '/';
@@ -217,6 +385,14 @@ Widget = function () {
 
     }
 
+    self.content_2 = function(){
+        var defEl = self.element.find('.' + self.options.content_2)
+        self._content_2 = arg(arguments, 0, self._content_2 || defEl);
+
+        return self._content_2;
+
+    }
+
     self.showLoader = function(id) {
         //debugger;
         self._loaderCalls.push(id);
@@ -266,13 +442,52 @@ Widget = function () {
         var initStateValue = arg(arguments, 0, 1);
         var mod = self.store.getCreate('toggleHighlight', initStateValue);
         var val = self.store.set('toggleHighlight', mod+=1);
+        self.highlight( (mod % 2 == 0) )
+        return val;
+    }
 
-        if(mod % 2 == 0) {
-            self.backgroundColor(self.options.highlightColor);
-        }
-        else 
-        {
+    self.unhighlight = function(){
+        /*
+        unhighlight the widget and return to the 
+        options.backgroundColour
+        */
+        var unhl = arg(arguments, 0, true);
+
+        if(unhl === true) {
             self.backgroundColor(self.options.backgroundColor);
+            self.highlighted = false;
+        } else {
+            // double negative request unhighlight(false) un-unhighlight
+            self.highlight()
+        }
+
+        if(arguments[0]) {
+            return self;
+        } else {
+            return self.highlighted;
+        }
+    }
+
+    self.highlight = function(){
+        /*
+        highlight the widget with it's options.highlightColor
+
+        highlight(true) will turn on highlighting
+        highlight(false) will turn off highlighting
+        */
+        var hl = arg(arguments, 0, true);
+        
+        if(hl=== true) {
+            self.backgroundColor(self.options.highlightColor);
+            self.highlighted = true;
+        } else {
+            self.unhighlight(true);
+        };
+
+        if(arguments[0]) {
+            return self;
+        } else {
+            return self.highlighted;
         }
     }
 
@@ -365,7 +580,7 @@ Widget = function () {
             self.element.dblclick(function(e){
                 self.options.onDoubleClick.call(self, e, self.options);
             });
-
+            self.returnHandler = self.options.returnHandler;
             self.pageLoadHandler = self.options.pageLoadHandler;
         }
 
@@ -399,13 +614,16 @@ Widget = function () {
 
                     // Replace image with new SVG
                     $img.replaceWith($svg);
-
+                    
                     self.iconColor();
                     
                     // Hook the events to self.
 
                     //page.addEventReceiver.call(self, self.options.touchHandler);
                     self.show.call(self);
+                    //$svg.parent().width($svg.parent().width() + 'px')
+                    $svg.width(($svg.parent().width() * .75 )+ 'px')
+
                 });
 
             } else {
@@ -423,15 +641,50 @@ Widget = function () {
         })
     }
 
-    self.showOpenState = function(){
+    self.kill = function(){
+        /*
+        Delete a widget from the interface and the memory.
+        This should give the ability to reaload the object.
+        */
+        // remove from interface,
+        self.showClosedState();
+        // perform unlock, tell the lockParent.
+        if(self.locked) {
+            self.unlock(self.lockParent);
+        }
+        wid.grid().remove_widget(wid.element)
+        // remove locks
+        // remove from memory
+        // remove from requirejs
+    }
 
-        self.height(self.options.openHeight);
-        self.width(self.options.openWidth);
+    self.showOpenState = function(){
+        /* Open a template provided or load the default
+        main.html (coded at server level) */
+        var data = arg(arguments, 0, {});
+        
+        if(typeof(data) == 'string') {
+             data = {
+                page: data,
+                name: self.options.name
+            }
+        } else {
+            data.name = data.name || self.options.name;
+            data.path = data.path || 'main.html';
+            data.cache = data.cache || true;
+
+        }
+        
+        var width = arg(arguments, 1, self.options.openWidth);
+        var height = arg(arguments, 2, self.options.openHeight);
+        self.width(width);
+        self.height(height);
         // self.text() returns jquery element
         self.textElement().css('font-size', '24px');
         // hence the ugly syntax
         self.closed = false;
         self.open = true;
+        self._pagevisble = true
         
         self.text(self._openText || self.options.openText || self.text());
 
@@ -439,10 +692,66 @@ Widget = function () {
             self.icon(self.options.openIcon);
         }
 
-        self.showPage(self.options.name);
+        // data.icon = self.icon
+
+        self.content_1().hide()
+        self.content_2().hide()
+        console.log('widget::showOpenState::called')
+        self.showPage(data, null);
         self.options.openHandler.apply(self)
         
         return self;
+    }
+
+    self.showPage = function() {
+        /*
+        Open the iframe main.html page. All handlers and callbacks
+        are defined.
+
+        name - the application name to serve the template from
+        path - assetPath of the template 'main.html'
+        cache - force reload cache (false)
+        */
+        var data = arg(arguments, 0, data);
+        var path = arg(arguments, 1, null);
+        var cache = arg(arguments, 2, data.cache);
+
+        var name = data;
+        if(typeof(data) == 'object') { 
+            name = data.name;
+            if(path == null) path = data.path || '';
+        };
+        // If use cache, collect json data. else, make new data
+        var jsonData = JSON.stringify(data);
+        console.log("Displaying page", name, jsonData)
+        // User has passed arg(2), 
+        // or user has data.cache, 
+        // or data is the same as the previous request data
+        var useCache = cache || (jsonData == self._oldRequestData);
+
+        if( (cache == null) 
+            && self._oldRequestData != undefined 
+            && self._oldRequestData != null
+            && jsonData == self._oldRequestData) {
+            // no cache provided. Provide old cache data as this request may
+            // by lazy (iframe display)
+            useCache = true
+        } 
+        // usecache check 
+        console.log('Use cache', cache, useCache, self.open)
+        if(useCache && self.currentPage) {
+            console.log("Using cache infomation")
+            self.iframe().show();
+        } else if(self.open == true) {
+            console.log("realoading data")
+            // Make server request to show the requested page.
+            self._oldRequestData = jsonData
+            self.getOpenHtml({
+                appname: name,
+                data: jsonData,
+                assetPath: path
+            }, self.getOpenHtmlReceiver)
+        }
     }
 
     self.showClosedState = function() {
@@ -451,6 +760,10 @@ Widget = function () {
             $(self.element).find('iframe').hide();
             self._pagevisble = false;
         }
+
+        self.content_1().show()
+        self.content_2().show()
+
         self.width(self.options.closedWidth);
         self.height(self.options.closedHeight);
         //self.icon()[0].src = self.closedIconUrl();
@@ -465,16 +778,6 @@ Widget = function () {
         return self;
     }
 
-    self.showPage = function(appname) {
-        if(self.open == true) {
-            // Make server request to show the requested page.
-            self.getOpenHtml({
-                appname: appname,
-                assetPath: ''
-            }, self.getOpenHtmlReceiver)
-        }
-    }
-
     self.pageLoadHandler = function(element) {
         console.log('pageLoadHandler');
     }
@@ -483,10 +786,19 @@ Widget = function () {
         // get request
         var url = 'widget/page/' + context.appname + '/';
 
-        jsonResponse(url, 'GET', {}, function(data){
+        jsonResponse(url, 'GET', context, function(data){
             // data received from endpoint.
             // load asset path into view.
-            self.getOpenHtmlReceiver.call(self, context, data)
+
+            if(data.error === true) {
+                if(data.code == 1) {
+                    // no template
+                    console.log("No template");
+                }
+            } else {
+                self.getOpenHtmlReceiver.call(self, context, data)
+                
+            }
         })
     }
 
@@ -495,49 +807,76 @@ Widget = function () {
         // create iframe, 
         // change interface style.
         // render site
+        var iframe = $(self.element).find('iframe#' + self.options.name + '_page');
 
-        if(
-            ($(self.element).find('iframe#' + self.options.name + '_page').length <= 0) &&
-            (data != '') )  {
+        if( (iframe.length <= 0) && (data != '') )  {
             // Create the iframe if it does not exist.
             $(self.element).uiji('iframe{id=' + context.appname +'_page}', function(){
                 $(this).hide()
-             
-                $(this).load(function(){
+                 $(this).load(function(){
 
-                    $(this).contents().find('.close').click(function(){
-                        self.showClosedState();
-                    });
-                    $(this).delay(200).fadeIn(function(){
+
+                    $(this).show(function(){
                         self._pagevisble = true;
                         // Pass the iframe as the arg. Which is nice.
                         self.currentPage = $(this).contents();
+                        self.currentPage.find('body').html(data)
+                        self.currentPage.find('.close').click(function(){
+                            self.showClosedState();
+                        });
+
                         self.pageLoadHandler(self.currentPage);
                     });
                 })
 
-                self.iframeUrl('/widget/page/' + context.appname + '/', this);
+                // self.iframeUrl('/widget/page/' + context.appname + '/', this, null, context);
                 
             });
         } else {
-            self.iframeUrl('/widget/page/' + context.appname + '/');
-            $(self.element).find('iframe').show();
+             console.log("present data to existing iframe")
+            self.iframe().contents().find('body').html(data)
+            self.iframe().show()
+            self.pageLoadHandler(self.currentPage);
+             self.currentPage.find('.close').click(function(){
+                 self.showClosedState();
+            });
+            // self.iframeUrl('/widget/page/' + context.appname + '/', null, context);
             if(self.dev == true) {
-                $(self.element).find('iframe').contents()[0].location.reload(true);
+                // $(self.element).find('iframe').contents()[0].location.reload(true);
             }
             self._pagevisble = true;
         }
     }
 
-    self.iframeUrl = function(url){
-        var _iframe = $(self.element).find('iframe#' + self.options.name + '_page');
+    self.iframe = function() {
+        return $(self.element).find('iframe');
+    }
+
+    self.iframeUrl = function(){
+        var url = arg(arguments, 0, null)
+        var iframe = arg(arguments, 1, _iframe)
+        var context = arg(arguments, 2, {})
+
+        if(_iframe == null) {
+            var _iframe = $(self.element).find('iframe#' + self.options.name + '_page');
+            
+        }
+
+
         if(_iframe.length > 0) {
             _iframe = null;
         }
         var iframe = arg(arguments, 1, _iframe);
+        var str = "";
+        for (var key in context) {
+            if (str != "") {
+                str += "&";
+            }
+            str += key + "=" + context[key];
+        }
 
         if(iframe) {
-            iframe.src = url;
+             iframe.src = url + '?' + str; 
         }
     }
 
@@ -560,7 +899,8 @@ Widget = function () {
         return sprintf(self.options.format, {
             text: text,
             icon: icon,
-            content_1: ''
+            content_1: '',
+            content_2: ''
         })
     }
 
@@ -846,9 +1186,10 @@ Widget = function () {
         if(_bc != null){
             // self.options.backgroundColor = _bc;
             this.element.css('background-color', _bc);
-            
-            self.textColor(self.contrast(_bc));
-            self.iconColor(self.contrast(_bc));
+            var contrast = self.contrast(_bc)
+            // console.log("Widget::backgroundColor::contrast", contrast, _bc)
+            self.textColor(contrast);
+            self.iconColor(contrast);
             return self;
         }
 
