@@ -10,6 +10,8 @@ from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 import os
 from cframe.serializers import json_response, json_serialize
+from django.contrib.auth.models import User
+import json
 
 def context(request):
     c = {}
@@ -48,24 +50,59 @@ def list(request):
 def page(request, name):
     c= {}
     c['widgets'] = Widget.objects.filter(active=True)
+    c['users'] = User.objects.filter(is_active=True)
+    c['error'] = False
+
+    tn = request.GET.get('assetPath', 'main.html')
+    if tn == '':
+        tn = 'main.html'
+    data = request.GET.get('data', None)
+
+    if data:
+        jsondata = json.loads(data)
+        c['data'] = jsondata
+    # assert False
+
+    _asjson = True if request.GET.get('json', request.is_ajax()) else False
+    c['is_ajax'] = _asjson
+
     ws = Widget.objects.filter(name=name)
-    print len(ws)
+
     if len(ws) >= 1:
         w = ws[0]
         c['widget'] = w
         c['path'] = '/media/unpacked/%s' % w.path
 
-        template = '%s/media/unpacked/%s/templates/main.html' % (settings.PROJECT_ROOT, w.path)
+        template = '%s/media/unpacked/%s/templates/%s' % (settings.PROJECT_ROOT, w.path, tn)
 
         try:
             get_template(template) 
         except TemplateDoesNotExist:
-            print 'missing template', template
-            return HttpResponse('')
+            c['error'] = True
+            c['code'] = 1
+            c['reason'] = 'Template missing "%s"' % (template)
+            c['attempt'] = '''Enure the Widget.name of the widget exists in the
+                database. Ensure the template name is correct ("%s")''' % (tn)
 
-    return render_to_response(template, c, 
+            # Clear widgets before returning ajax
+            c['widgets'] = None
+            return json_response(c)
+
+        return render_to_response(template, c, 
                               context_instance=RequestContext(request, 
                                                         processors=[context]))
+    elif len(ws) <= 0:
+        c['error'] = True
+        c['code'] = 2
+        c['reason'] = 'No widgets named "%s"' % name
+        c['attempt'] = '''Enure the Widget.name of the widget exists in the
+            database.'''
+        
+        c['widgets'] = None
+        return json_response(c)
+       
+ 
+    return HttpResponse('No response for "%s". Found: %s' % (name, len(ws))) 
 
 def data(request, name):
     ''' Return a data object ready for requirejs to implement for 
@@ -78,6 +115,7 @@ def data(request, name):
         c['path'] = '/media/unpacked/%s' % w.path   
     t = 'define(' + json_serialize(c) + ')'
     return HttpResponse(t)
+
 
 def manifest(request, name):
 
@@ -95,6 +133,7 @@ def manifest(request, name):
                 c[v] = manifest.__dict__.get(v)
     
     return json_response(c)
+
 
 def install_widget(widget):
     pass
