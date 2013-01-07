@@ -20,7 +20,10 @@ urlpatterns = patterns('',
 
 
 urlpatterns += patterns('', 
-    (r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(settings.MEDIA_ROOT, 'images'), 'show_indexes': True}),
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    (r'^images/(?P<path>.*)$', 'django.views.static.serve', 
+        {'document_root': os.path.join(settings.MEDIA_ROOT, 'images'), 
+        'show_indexes': True}),
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', 
+        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
 )
 urlpatterns += staticfiles_urlpatterns()
