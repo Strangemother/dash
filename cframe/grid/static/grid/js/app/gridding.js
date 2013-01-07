@@ -30,7 +30,11 @@ gridding.addWidget = function(){
     and placed on the current grid.
     */
     var widget = arg(arguments, 0, null);
-    var context = arg(arguments, 1, {})
+    var context = arg(arguments, 1, {});
+    var callback = arg(arguments, 2, function(){
+        console.log("gridding::addwidget callback function", arguments)
+    });
+
 
     var gridster = $(".gridster ul").gridster().data('gridster');  
     
@@ -40,8 +44,9 @@ gridding.addWidget = function(){
             function () {
                 require(['app/Widget'], function(){
                     wid = Widget(widget, context);
-                    wid.addToGrid(gridster); 
+                    wid.addToGrid(gridster);
                     gridding.widgets.push(wid)
+                    callback(wid);
                 })
          });
 
@@ -50,6 +55,7 @@ gridding.addWidget = function(){
             wid = Widget(widget, context);
             wid.addToGrid(gridster); 
             gridding.widgets.push(wid)
+            callback.call(wid, wid);
         })
 
 
