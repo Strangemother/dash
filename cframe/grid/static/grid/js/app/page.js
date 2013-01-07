@@ -8,14 +8,27 @@ page.backgroundColor = function(){
 
 page.appendWidgets = function() {
     var widgets = arg(arguments, 0, []);
+    var callback = arg(arguments, 1, function(){});
+    var wids = []
     for(var i=0; i < widgets.length; i++) {
-        page.appendWidget(widgets[i])
+        page.appendWidget(widgets[i], {}, function(widget){
+            console.log('Page::appendWidgets, appendWidget callback', widget)
+            wids.push(widget);
+            if(wids.length == widgets.length) {
+                if(typeof(callback) == 'function') {
+                    return callback.call(this, wids);    
+                }   
+            }
+        })
     }
+    
+    return null;
 }
 
 page.appendWidget = function() {
     var widgetPathData = arg(arguments, 0, null);
     var context = arg(arguments, 1, {});
+    var callback = arg(arguments, 2, function(widget){ return widget; });
 
     if(widgetPathData == null) {
         return false;
@@ -50,8 +63,8 @@ page.appendWidget = function() {
                 // ready inside the context of the object before loosing scope.
 
                 // RegisterWidget can accept an object or a function.
-               
-                gridding.addWidget(widgetData, context)
+                // callcabk should be called.
+                gridding.addWidget(widgetData, context, callback)
                 //gridding.createGrid(gridding.layout());
         });
         
@@ -61,13 +74,15 @@ page.appendWidget = function() {
         var contxt = '/widget/data/' + widgetPathData;
         var widgetPath = '/media/unpacked/' + widgetPathData + '/main.js';
         require([contxt, widgetPath, 'gridding'], function(context, widget){
-            gridding.addWidget(widget, context);
+            gridding.addWidget(widget, context, callback);
             //gridding.createGrid(gridding.layout());
         });
         
     }
     //page.createInterfaceButton(widgetData)
-    return true;
+
+    // callback needs to be called.
+    return null
 }
 
 page.fullalert = function(){
