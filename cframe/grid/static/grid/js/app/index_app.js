@@ -20,42 +20,97 @@ registerWidget = function (widgetData){
     Provide a scope to the widget.
     */
     var callback = arg(arguments, 1, function(){});
-    console.log("register widget")
     var _w = widgetData;
 
-    // TODO: It's a bad idea to execute the function here.
-    // consider removing this functionality so dependencies are correctly
-    // attributed.
-
-    // get name
+    // get installed information
+    console.log("index_app::registerWidget::making request for", widgetData.name);
+    
+    
     jsonResponse('/widget/data/' + widgetData.name + '/', 'GET', {}, function(data){
-        if(typeof(widgetData) == 'function') {
-            // execute function passing context of paths and data
-            console.log('registerWidget::f')
-            _w = widgetData(data);
+        console.log('index_app::registerWidget::object returned from ajax');
 
-        }else {
-            console.log('registerWidget::object')
-            _w.context = data
+        // this is where this data should go - although useful.
+        _w.context = data
+
+        // User verify, 
+        /*
+        Returns true/false if is allowed to install.
+        */
+        var verify = verifyInstall(widgetData)
+        // Display dependencies for install info of third party.
+        if(!verify) {
+            /*
+            Verification is not allowed.
+            return an object requirejs will use as 
+            widgetData. Perhaps a placeholder widget?
+            */
+            
+            // kill
+        } else {
+
+            // Check for addon injection to widget data.
+
+            // requirejs register
+            // var def = requirejsImport(widgetData)
+
+            // debugger;
+            // inject js endpoint for requirejs widget imports
+
+
         }
-        callback(_w)       
-        
-        var dependencies = ['app/Widget'];
-        /* 
-        // Push user defined dependencies (if any) into a stack to be called.
-        // Cool huh! Depedencies . O.o...
-        var _access = _w.dependencies || [];
-        for (var i = 0; i < _access.length; i++) {
-            dependencies.push(_access[i]);
-        };
-
-        define(dependencies, function(){
-            return function() { return _w; };
-        })
-       */
-       return _w
+        callback(_w)
     })
 
+    return requirejsImport(widgetData)
+
+}
+
+verifyInstall = function(widgetData) {
+    /* Perform checks and ask user if the installation
+    can occur.
+    failHandler will be called on widgetData.
+    */
+
+    // Ask user for allow
+    // check blacklist
+
+    // call widgetData.verifyInstallHandler(choice)
+        // Call this method when a choice is made
+
+    return true // false
+}
+
+requirejsImport = function(widgetData) {
+    /*
+    Import the widget data - by kinda turning it inside out
+    and flipping it on it's head.
+    Also, you're receiving raw wridget data - not yet wrapped by a Widget()
+
+    + full advantage of the require js lib,
+
+    require import, pulling dependencies first, calling widgetData.setupHandler(widgetData) 
+    */
+    
+    var dependencies = widgetData.dependencies || [];
+    var setupHandler = widgetData.setupHandler || function(widgetData){ return widgetData; };
+    // check scope is passed correctly.
+   
+    return define(dependencies, (function(){
+            var newData = setupHandler.apply(this, widgetData);
+
+            if(newData == undefined) {
+                return widgetData;
+            };
+
+            return newData;
+        }.apply({
+            /* Base widget Scope */
+            developer: 'fishy',
+            widgetData: widgetData,
+            setupHandler: setupHandler
+        }) 
+
+    ))
 }
 
 ASSET_IMG_URL = '/static/grid/img/';
