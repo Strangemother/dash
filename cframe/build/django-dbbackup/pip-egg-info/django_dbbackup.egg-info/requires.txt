@@ -1,2 +1,0 @@
-simples3==1.0
-dropbox>=1.3
